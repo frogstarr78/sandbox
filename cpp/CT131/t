@@ -1,0 +1,344 @@
+
+/****************************
+*
+*	Scott Noel-Hemming
+*	CT131
+*	Sunday 2006-05-28 16:17:05
+*	Project	#9	PokerHand	(P.563)
+*
+****************************/
+
+#define POKER
+#include <iostream>
+#include <algorithm>
+#include <string>
+#include <Console.h>
+#include <stdlib.h>
+#include <time.h>
+#include <StandardFunctions.h>
+using noelhemming::prompt;
+using noelhemming::alertn;
+using noelhemming::shouldIContinue;
+//#include <Doc.h>
+using namespace std;
+
+struct Cards {
+	char suit, value;
+
+	void setSuit(char suit) { this->suit = suit; }
+	void setValue(char value) { this->value = value; }
+
+	bool operator ==(const Cards& card) {
+		return (this->suit == card.suit && this->value == card.value);
+	}
+
+	bool operator < (const Cards& card) {
+		return (this->value < card.value);
+	}
+};
+
+struct Deck {
+	typedef Cards* cardsPtr;
+	cardsPtr cards;
+
+	const static int cardNumberCount = 13;
+	const static char HEART = '\x03';
+	const static char DIAMOND = '\x04';
+	const static char CLUB = '\x05';
+	const static char SPADE = '\x06';
+
+	const static char suits[4];
+	char values[cardNumberCount];
+	int COUNT;
+
+	Deck(int numberOfDecks=1) {
+		srand( time(NULL) );
+		COUNT = numberOfDecks*52;
+		cards = new Cards[COUNT];
+
+		char suits[4] = {HEART, CLUB, DIAMOND, SPADE};
+		char values[cardNumberCount] = {'2', '3', '4', '5', '6', '7', '8', '9', '0', 'j', 'q', 'k', 'a'};
+
+		int i=0;
+		for(int j=0; j<4; j++) {
+			for(int k=0; k<cardNumberCount; k++) {
+				cards[i].suit = suits[j];
+				cards[i].value = values[k];
+
+				disposedCards[i].suit = '\0';
+				disposedCards[i].value = -1;
+				i++;
+			}
+		}
+	}
+
+	bool hasUsed(int cardInt) {
+		if (disposedCards[cardInt].suit == '\0' && disposedCards[cardInt].value == -1) {
+			disposedCards[cardInt].suit = cards[cardInt].suit;
+			disposedCards[cardInt].value = cards[cardInt].value;
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	private:
+		Cards disposedCards;
+};
+
+struct Hand {
+	typedef bool* BoolPtr;
+	const static int COUNT = 5;
+	const static int cardNumberCount = 13;
+	BoolPtr isPair, isTre, isTwoPair, isFour, isFullHouse;
+	BoolPtr isFlush, isStraight, isStraightFlush, isNothing;
+	BoolPtr handValue[9];
+	int values[cardNumberCount];
+	Cards cards[COUNT];
+
+	Hand() {
+		cardsInHand = 0;
+		isNothing=new bool(true);
+		isPair = new bool(false);
+		isTre=new bool(false);
+		isTwoPair=new bool(false);
+		isFour=new bool(false);
+		isFullHouse=new bool(false);
+		isFlush=new bool(false);
+		isStraight=new bool(false);
+		isStraightFlush=new bool(false);
+
+		BoolPtr handValue[9] = {isNothing, isPair, isTwoPair, isTre, isStraight, isFlush, isFullHouse, isFour, isStraightFlush};
+		char values[cardNumberCount] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	};
+
+void append(Cards& card) {
+	cards[cardsInHand] = card;
+	cardsInHand++;
+
+	cout << "value " << card.value << endl;
+	values[card.value]+=1;
+	for (int i=0; i<cardNumberCount; i++) {
+		cout << "values[" << i << "]= " << values[i] << endl;
+	}
+//		suits[card.suit]++;
+}
+
+void setValue(BoolPtr param, bool value=true) {
+	*param = value;
+	if (value == true)
+		*isNothing = (!value);
+}
+
+
+void checkPairs () {
+	int pairs = 0;
+/*		int array[cardNumberCount] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+	int j=0;
+	for (int i=0; i<cardNumberCount; i++) {
+		array[cards[i].value%cardNumberCount]++;
+	}
+*/
+	exit(1);
+	for(int i=0; i<cardNumberCount; i++){
+		if (values[i] == 4) {
+			setValue(isFour);
+		} else if (values[i] == 3) {
+			pairs++;
+			setValue(isTre);
+		} else if (values[i] == 2) {
+			pairs++;
+			setValue(isPair);
+		}
+
+	}
+		if (pairs > 1) {
+			if (*isPair == true && 
+				*isTre == true) {
+				setValue(isFullHouse);
+			} else {
+				setValue(isTwoPair);
+			}
+		}
+}
+
+void checkFlushAndStraight () {
+	sort(cards, cards+5);
+
+	int origValue = cards[0].value;
+	char initSuit = cards[0].suit;
+	for(int i=1; i<5; i++) {
+		if ( origValue+1 != cards[i].value )
+			setValue(isStraight, false);
+//			else
+//				setValue(isStraight);
+
+		if ( initSuit != cards[i].suit )
+			setValue(isFlush, false);
+//			else
+//				setValue(isFlush);
+		origValue = cards[i].value;
+	}
+}
+
+void checkStraightFlush () {
+	checkFlushAndStraight();
+	if ( *isStraight && *isFlush )
+		setValue(isStraightFlush);
+//		else
+//			setValue(isStraightFlush, false);
+}
+
+int score() {
+	checkPairs();
+	checkStraightFlush();
+
+	for(int i=0; i<9; i++){
+		if (*handValue[i] == true)
+			return i;
+	}
+	return 0;
+}
+
+	protected:
+		int cardsInHand;
+};
+
+	struct Player {
+		Hand hand;
+		string name;
+
+		Player(): name("") {};
+		void setName(string name) { this->name = name; }
+		string getName() { return this->name; }
+		void showHand() {
+			namespace con = JadedHoboConsole;
+			sort(hand.cards, hand.cards+hand.COUNT);
+			cout << name << " has: " << endl;
+
+			for (int i=0; i<hand.COUNT; i++){
+				cout << con::fg_red << hand.cards[i].suit << hand.cards[i].value << " ";
+			}
+			cout << con::fg_white << " for ";
+			switch (hand.score()) {
+				case 0:
+					cout << "Nothing";
+					break;
+				case 1:
+					cout << "a Pair";
+					break;
+				case 2:
+					cout << "Two Pair";
+					break;
+				case 3:
+					cout << "Three of a kind";
+					break;
+				case 4:
+					cout << "a Straight";
+					break;
+				case 5:
+					cout << "a Flush";
+					break;
+				case 6:
+					cout << "a Full House";
+					break;
+				case 7:
+					cout << "Four of a kind";
+					break;
+				case 8:
+					cout << "a Straight Flush";
+					break;
+			}
+			cout << endl;
+		}
+	
+		int getHighCard () {
+			int highCard = hand.cards[0].value;	
+			for (int i=1; i<hand.COUNT; i++ ) {
+				if ( hand.cards[i].value > highCard )
+					highCard = hand.cards[i].value;
+			}
+			return highCard;
+		}
+
+	void deal(Player& player, Cards cards[]) {
+		namespace con = JadedHoboConsole;
+		int cardInt = rand()%52;
+
+		player.hand.append(cards[cardInt]);
+
+		cout << "dealing "  << player.getName() << " a " << con::fg_red << cards[cardInt].suit << cards[cardInt].value << con::fg_white << endl;
+	}
+
+	void deal(Player& player, Deck& deck) {
+		namespace con = JadedHoboConsole;
+		int cardInt;
+
+		while (Deck.hasUsed(cardInt)) {
+			 cardInt = rand()%52;
+		}
+
+		player.hand.append(Deck.cards[cardInt]);
+
+		cout << "dealing "  << player.getName() << " a " << con::fg_red << Deck.cards[cardInt].suit << Deck.cards[cardInt].value << con::fg_white << endl;
+	}
+
+	};
+
+void announceWinner(Player&);
+
+void main() {
+
+	Player player;
+	Player house;
+	string name;
+
+	prompt(&name, "Player's Name:");
+	player.setName(name);
+	house.setName("House");
+
+	do {
+		Deck deck;
+		Hand playerHand;
+		Hand houseHand;
+
+		player.hand = playerHand;
+		house.hand = houseHand;
+
+		house.deal(player, deck);
+		house.deal(house, deck);
+		house.deal(player, deck);
+		house.deal(house, deck);
+		house.deal(player, deck);
+		house.deal(house, deck);
+		house.deal(player, deck);
+		house.deal(house, deck);
+		house.deal(player, deck);
+		house.deal(house, deck);
+
+		player.showHand();
+		house.showHand();
+
+		if ( player.hand.score() > house.hand.score() ) {
+			announceWinner(player);
+		} else if ( player.hand.score() > house.hand.score() ) {
+			announceWinner(house);
+		} else if ( !player.hand.isNothing && !house.hand.isNothing ) {
+			
+			if ( player.getHighCard() > house.getHighCard() ) {
+				announceWinner(player);
+			} else if ( player.getHighCard() < house.getHighCard() ) {
+				announceWinner(house);
+			} else {
+				cout << "Push" << endl;
+			}
+		}
+
+	} while ( shouldIContinue() );
+
+}
+
+void announceWinner(Player& player) {
+	cout << player.getName() << " WINS!" << endl;
+}
