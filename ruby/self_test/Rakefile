@@ -1,0 +1,12 @@
+# -*- ruby -*-
+
+require 'rubygems'
+require 'hoe'
+require './lib/self_test.rb'
+
+Hoe.new('self_test', SelfTest::VERSION) do |p|
+  p.rubyforge_name = 'self_testx' # if different than lowercase project name
+  p.developer('Scott Noel-Hemming', 'frogstarr78@gmail.com')
+end
+
+# vim: syntax=Ruby

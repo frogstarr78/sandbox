@@ -1,0 +1,174 @@
+#!/usr/bin/env ruby
+
+class Me < Struct.new( :id, :name, :description, :is_new, :sent_at, :do_this )
+  
+  def do_this!
+    self.instance_eval &self.do_this
+  end
+
+  def is_new?
+    self.is_new == true
+  end
+end
+
+m = Me.new 1, 'bob', 'hello', true, DateTime.now, proc { "#{description} #{name}?" }
+puts m.inspect
+puts m.do_this!
+
+<<-EOR
+  m.includes? SelfTest
+  m.given? SelfTest, :raises => TypeError
+  m.given? FalseClass, :raises => TypeError
+  m.respond_to? :name
+
+
+<<-EOC
+  Given this
+  when this.value = true
+  then this.other_value == true
+
+  with this
+  when :value => true
+  then :other_value.true?
+EOC
+
+  m.when :name => 'bob', :do_this!.matches? => :name
+  m.when :is_new => true, :is_new.is? => true
+  m.when :sent_at => DateTime.now, :sent_at.between? => [1.day.ago, 1.day.from_now]
+  m.when :sent_at => DateTime.now, :sent_at.between? => (1.day.ago..1.day.from_now)
+  m.when :sent_at => DateTime.now, :sent_at.after? => 1.day.ago, :sent_at.before? => 1.day.from_now
+  m.when :before! => :save, :is_new.is? => true, :after! => :save, :is_new.is? => false
+  m.when :before! => :save, [:new?, :is_new].are? => true, :after! => :save, [:new?, :is_new].are? => false
+  m.when :before! => :save, [:new?, :is_new].are? => true, :after! => :save, [:new?, :is_new].are? => false
+
+  m.before :save, [:new?, :is_new].are? => true
+  m.after  :save, [:new?, :is_new].are? => false
+EOR
+
+
+
+class IBFPST
+  require 'if_by_phone_schedule'
+
+  def setup
+    @if_by_phone_schedule = IfByPhoneSchedule.new
+  end
+#      assert_equal Time::RFC2822_DAY_NAME[Time.now.wday], if_by_phone_schedules(:enabled).week_day_string
+  @if_by_phone_schedule.when( 
+    :week_day => DateTime.now.wday, 
+    :week_day_string.equal? => Time::RFC2822_DAY_NAME[Time.now.wday]
+  )
+
+#        assert_not_equal if_by_phone_schedules(:week_day_sort).week_day, if_by_phone_schedules(:disabled).week_day
+  @comparison_if_by_phone_schedule.with do 
+    week_day DateTime.now+1
+    hour.delta! 1.hour
+  end
+    
+  # AR way
+  IfByPhoneSchedule.new :week_day => DateTime.now.wday do
+    :week_day.not_equal? => @comparison_if_by_phone_schedule.week_day
+    :hour.less_than?     => @comparison_if_by_phone_schedule.hour
+  end
+  
+  # SelfTest/Cucumber
+  @if_by_phone_schedule.when :week_day => DateTime.now.wday do
+    :week_day.not_equal? => @comparison_if_by_phone_schedule.week_day
+    :hour.less_than?     => @comparison_if_by_phone_schedule.hour
+  end
+
+  @if_by_phone_schedule.when :week_day => DateTime.now.wday do |with.new|
+    :week_day.not_equal? => :new.with
+      :week_day = DateTime.now+1
+      :hour.delta! = 1.hour
+    :hour.less_than?     => :new.hour
+  end
+
+  [@if_by_phone_schedule, @comparison_if_by_phone_schedule].when 
+    :before! => :sort, :sort.order? => [@if_by_phone_schedule, @comparison_if_by_phone_schedule] 
+    :after! => :sort, :sort.order? => [@comparison_if_by_phone_schedule, @if_by_phone_schedule]
+
+  IfByPhoneSchedule.when
+    :new.with 
+      :week_day => DateTime.now.wday,
+      :hour     => DateTime.now.hour,
+    :show_click_to_call?.is? => true
+
+  IfByPhoneSchedule.when
+    :with.instance do
+      week_day => DateTime.now.wday,
+      hour     => DateTime.now.hour
+    end,
+    :show_click_to_call?.is? => true
+
+  IfByPhoneSchedule.when
+    :instance.week_day => DateTime.now.wday,
+    :instance.hour     => DateTime.now.hour,
+    :show_click_to_call?.is? => true
+
+  IfByPhoneSchedule.when
+    :new.week_day => (DateTime.now-1).wday,
+    :new.hour     => DateTime.now.hour,
+    :show_click_to_call?.is? => false
+
+  IfByPhoneSchedule.when
+    :new.week_day => DateTime.now.wday,
+    :new.hour     => (DateTime.now-1).hour,
+    :show_click_to_call?.is? => false
+
+end
+
+
+class IfByPhoneScheduleTest < ActiveSupport::TestCase
+  fixtures :if_by_phone_schedules
+
+  context IfByPhoneSchedule do
+    should "should return pretty string output for week_day_string" do
+      assert_equal Time::RFC2822_DAY_NAME[Time.now.wday], if_by_phone_schedules(:enabled).week_day_string
+    end
+
+  end
+
+  context "IfByPhoneSchedule sorting" do
+    context "by week_day" do
+      should "not have fixtures with the same week_day" do
+        assert_not_equal if_by_phone_schedules(:week_day_sort).week_day, if_by_phone_schedules(:disabled).week_day
+      end
+
+      should "have one fixture with earlier hour" do
+        assert if_by_phone_schedules(:enabled).hour < if_by_phone_schedules(:disabled).hour
+      end
+
+      should "sort as expected" do
+        assert_equal [if_by_phone_schedules(:disabled), if_by_phone_schedules(:week_day_sort)], [if_by_phone_schedules(:week_day_sort), if_by_phone_schedules(:disabled)].sort
+      end
+    end
+ 
+    context "by hour" do
+      should "have fixtures with the same week_day" do
+        assert_equal if_by_phone_schedules(:enabled).week_day, if_by_phone_schedules(:disabled).week_day
+      end
+
+      should "have one fixture with earlier hour" do
+        assert if_by_phone_schedules(:enabled).hour < if_by_phone_schedules(:disabled).hour
+      end
+
+      should "sort as expected" do
+        assert_equal [if_by_phone_schedules(:enabled), if_by_phone_schedules(:disabled)], [if_by_phone_schedules(:disabled), if_by_phone_schedules(:enabled)].sort
+      end
+    end
+  end
+
+  context "IfByPhoneSchedule::show_click_to_call?" do
+    should "return true when now is a enabled week_day and hour" do
+      assert IfByPhoneSchedule.show_click_to_call? 
+    end
+
+    should "return false when now is a disabled time" do
+      ibf = if_by_phone_schedules(:enabled)
+      ibf.enabled = false
+      ibf.save
+      assert !IfByPhoneSchedule.show_click_to_call? 
+    end
+  end
+end

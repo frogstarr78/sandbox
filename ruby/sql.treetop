@@ -1,0 +1,121 @@
+grammar Sql
+  rule select_stmt
+    ws* "SELECT" ws columns ws "FROM" ws .+ newline?
+  end
+
+  rule columns
+    '*' {
+      def literals?
+        false
+      end
+
+      def to_a
+        %w(*)
+      end
+    }
+    / literals {
+      def literals?
+        true
+      end
+
+      def to_a
+        text_value.split ','
+      end
+    }
+    / literal {
+      def literals?
+        false
+      end
+
+      def to_a
+        [text_value]
+      end
+    }
+  end
+
+  rule literals
+    literal+ (space? ',' space? literal)+
+  end
+
+  rule literal
+    (  constant / function_call / [._a-zA-Z0-9]+ ) (space? operator space? literal)* alias? 
+  end
+
+  rule alias
+    space ('AS' / 'as') space ( quote_literal ( !quote_literal [ _a-zA-Z0-9] )+ quote_literal /  [ _a-zA-Z0-9]+ )
+  end
+
+  rule quote_literal
+    '"'
+  end
+
+  rule constant
+    string_constant / bit_constant / numeric_constant
+  end
+
+  rule string_constant
+    quote_val [\ ,"_a-zA-Z0-9]+ quote_val ( space? concat_op space? literal )*
+  end
+
+  rule quote_val
+    "'" / '$' ( !'$' . )* '$' {
+      def tag_name
+        text_value
+      end
+    }
+  end
+
+  rule bit_constant
+    'B' "'" [01]+ "'"
+  end
+
+  rule numeric_constant
+    digits
+    /
+    digits '.' digits? ( 'e' [-+] digits )?
+    /
+    digits? '.' digits ( 'e' [-+] digits )?
+    /
+    digits 'e' [-+] digits
+  end
+
+  rule concat_op
+    '||'
+  end
+
+  rule operator
+    '||' / [-+*<>/=~!@#%^&|`?]
+  end
+
+  rule alpha
+    [a-zA-Z]+
+  end
+
+  rule digits
+    [0-9]+
+  end
+
+  rule function_call
+    alpha '(' ( !')' . )* ')'
+  end
+
+  rule ws
+    ( space / tab / newline )+
+  end
+
+  rule space
+    ' '
+  end
+
+  rule newline
+    "\n"
+  end
+
+  rule tab
+    "\t"
+  end
+
+  rule semic
+    ';'
+  end
+end

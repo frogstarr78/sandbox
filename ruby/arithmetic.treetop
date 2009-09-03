@@ -1,0 +1,37 @@
+grammar Arithmetic
+  rule additive
+    multitive '+' additive {
+      def value
+        multitive.value + additive.value
+      end
+    } / multitive
+  end
+
+  rule add_op
+    '+'
+  end
+
+  rule multitive
+    primary '*' multitive { 
+	  def value
+	    primary.value * multitive.value
+	  end
+	} / primary
+  end
+
+  rule mult_op
+    '*'
+  end
+
+  rule primary
+    '(' additive ')' / number
+  end
+
+  rule number
+    [1-9] [0-9]* { 
+	  def value
+	    number
+	  end
+	}
+  end
+end
