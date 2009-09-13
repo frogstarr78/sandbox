@@ -554,7 +554,7 @@ module Sql
           else
             s15, i15 = [], index
             loop do
-              if input.index(Regexp.new('[ _a-zA-Z0-9]'), index) == index
+              if input.index(Regexp.new('[_a-zA-Z0-9]'), index) == index
                 r16 = instantiate_node(SyntaxNode,input, index...(index + 1))
                 @index += 1
               else

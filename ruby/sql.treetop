@@ -42,7 +42,7 @@ grammar Sql
   end
 
   rule alias
-    space ('AS' / 'as') space ( quote_literal ( !quote_literal [ _a-zA-Z0-9] )+ quote_literal /  [ _a-zA-Z0-9]+ )
+    space ('AS' / 'as') space ( quote_literal ( !quote_literal [ _a-zA-Z0-9] )+ quote_literal /  [_a-zA-Z0-9]+ )
   end
 
   rule quote_literal
