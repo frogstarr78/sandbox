@@ -1,3 +1,14 @@
+#  Column = OStruct.new
+#  Column.text = ''
+#  Column.name = '?column?'
+#  Column.alias = ''
+#  Column.alias? = false
+#
+#  SelectStatement = OStruct.new
+#  SelectStatement.columns = Column.new.to_a
+#  SelectStatement.table = 
+
+
 module Sql
   include Treetop::Runtime
 
@@ -20,6 +31,10 @@ module Sql
 
     def ws
       elements[6]
+    end
+
+    def table_def
+      elements[7]
     end
 
   end
@@ -75,36 +90,18 @@ module Sql
                 r8 = _nt_ws
                 s0 << r8
                 if r8
-                  s9, i9 = [], index
-                  loop do
-                    if index < input_length
-                      r10 = instantiate_node(SyntaxNode,input, index...(index + 1))
-                      @index += 1
-                    else
-                      terminal_parse_failure("any character")
-                      r10 = nil
-                    end
-                    if r10
-                      s9 << r10
-                    else
-                      break
-                    end
-                  end
-                  if s9.empty?
-                    self.index = i9
-                    r9 = nil
-                  else
-                    r9 = instantiate_node(SyntaxNode,input, i9...index, s9)
-                  end
+                  r9 = _nt_table_def
                   s0 << r9
                   if r9
-                    r12 = _nt_newline
-                    if r12
-                      r11 = r12
+                    i10 = index
+                    r11 = _nt_ws
+                    if r11
+                      r10 = nil
                     else
-                      r11 = instantiate_node(SyntaxNode,input, index...index)
+                      self.index = i10
+                      r10 = instantiate_node(SyntaxNode,input, index...index)
                     end
-                    s0 << r11
+                    s0 << r10
                   end
                 end
               end
@@ -126,33 +123,78 @@ module Sql
     return r0
   end
 
-  module Columns0
-    def literals?
-      false
+  def _nt_table_def
+    start_index = index
+    if node_cache[:table_def].has_key?(index)
+      cached = node_cache[:table_def][index]
+      @index = cached.interval.end if cached
+      return cached
     end
 
-    def to_a
-      %w(*)
+    s0, i0 = [], index
+    loop do
+      if index < input_length
+        r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
+        @index += 1
+      else
+        terminal_parse_failure("any character")
+        r1 = nil
+      end
+      if r1
+        s0 << r1
+      else
+        break
+      end
+    end
+    if s0.empty?
+      self.index = i0
+      r0 = nil
+    else
+      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+    end
+
+    node_cache[:table_def][start_index] = r0
+
+    return r0
+  end
+
+  module Columns0
+    def to_s
+      text_value
+    end
+
+    def to_array
+      [text_value]
     end
   end
 
   module Columns1
-    def literals?
-      true
-    end
-
-    def to_a
-      text_value.split ','
+    def literal
+      elements[3]
     end
   end
 
   module Columns2
-    def literals?
-      false
+  end
+
+  module Columns3
+    def to_s
+      self
+#        text_value.split ','
     end
 
-    def to_a
-      [text_value]
+    def to_array
+      self.elements.collect(&:text_value)
+    end
+  end
+
+  module Columns4
+    def to_s
+      text_value
+    end
+
+    def to_array
+      [self]
     end
   end
 
@@ -176,102 +218,10 @@ module Sql
     if r1
       r0 = r1
     else
-      r2 = _nt_literals
-      r2.extend(Columns1)
-      if r2
-        r0 = r2
-      else
-        r3 = _nt_literal
-        r3.extend(Columns2)
-        if r3
-          r0 = r3
-        else
-          self.index = i0
-          r0 = nil
-        end
-      end
-    end
-
-    node_cache[:columns][start_index] = r0
-
-    return r0
-  end
-
-  module Literals0
-    def literal
-      elements[3]
-    end
-  end
-
-  module Literals1
-  end
-
-  def _nt_literals
-    start_index = index
-    if node_cache[:literals].has_key?(index)
-      cached = node_cache[:literals][index]
-      @index = cached.interval.end if cached
-      return cached
-    end
-
-    i0, s0 = index, []
-    s1, i1 = [], index
-    loop do
-      r2 = _nt_literal
-      if r2
-        s1 << r2
-      else
-        break
-      end
-    end
-    if s1.empty?
-      self.index = i1
-      r1 = nil
-    else
-      r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
-    end
-    s0 << r1
-    if r1
+      i2, s2 = index, []
       s3, i3 = [], index
       loop do
-        i4, s4 = index, []
-        r6 = _nt_space
-        if r6
-          r5 = r6
-        else
-          r5 = instantiate_node(SyntaxNode,input, index...index)
-        end
-        s4 << r5
-        if r5
-          if input.index(',', index) == index
-            r7 = instantiate_node(SyntaxNode,input, index...(index + 1))
-            @index += 1
-          else
-            terminal_parse_failure(',')
-            r7 = nil
-          end
-          s4 << r7
-          if r7
-            r9 = _nt_space
-            if r9
-              r8 = r9
-            else
-              r8 = instantiate_node(SyntaxNode,input, index...index)
-            end
-            s4 << r8
-            if r8
-              r10 = _nt_literal
-              s4 << r10
-            end
-          end
-        end
-        if s4.last
-          r4 = instantiate_node(SyntaxNode,input, i4...index, s4)
-          r4.extend(Literals0)
-        else
-          self.index = i4
-          r4 = nil
-        end
+        r4 = _nt_literal
         if r4
           s3 << r4
         else
@@ -284,22 +234,96 @@ module Sql
       else
         r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
       end
-      s0 << r3
-    end
-    if s0.last
-      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
-      r0.extend(Literals1)
-    else
-      self.index = i0
-      r0 = nil
+      s2 << r3
+      if r3
+        s5, i5 = [], index
+        loop do
+          i6, s6 = index, []
+          r8 = _nt_space
+          if r8
+            r7 = r8
+          else
+            r7 = instantiate_node(SyntaxNode,input, index...index)
+          end
+          s6 << r7
+          if r7
+            if input.index(',', index) == index
+              r9 = instantiate_node(SyntaxNode,input, index...(index + 1))
+              @index += 1
+            else
+              terminal_parse_failure(',')
+              r9 = nil
+            end
+            s6 << r9
+            if r9
+              r11 = _nt_space
+              if r11
+                r10 = r11
+              else
+                r10 = instantiate_node(SyntaxNode,input, index...index)
+              end
+              s6 << r10
+              if r10
+                r12 = _nt_literal
+                s6 << r12
+              end
+            end
+          end
+          if s6.last
+            r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
+            r6.extend(Columns1)
+          else
+            self.index = i6
+            r6 = nil
+          end
+          if r6
+            s5 << r6
+          else
+            break
+          end
+        end
+        if s5.empty?
+          self.index = i5
+          r5 = nil
+        else
+          r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+        end
+        s2 << r5
+      end
+      if s2.last
+        r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+        r2.extend(Columns2)
+        r2.extend(Columns3)
+      else
+        self.index = i2
+        r2 = nil
+      end
+      if r2
+        r0 = r2
+      else
+        r13 = _nt_literal
+        r13.extend(Columns4)
+        if r13
+          r0 = r13
+        else
+          self.index = i0
+          r0 = nil
+        end
+      end
     end
 
-    node_cache[:literals][start_index] = r0
+    node_cache[:columns][start_index] = r0
 
     return r0
   end
 
   module Literal0
+  end
+
+  module Literal1
+  end
+
+  module Literal2
     def operator
       elements[1]
     end
@@ -309,7 +333,17 @@ module Sql
     end
   end
 
-  module Literal1
+  module Literal3
+  end
+
+  module Literal4
+    def value
+      text_value.gsub /as/i
+    end
+
+#      def alias?
+#        text_value.include?( 'as' ) || text_value.include?( 'AS' )
+#      end
   end
 
   def _nt_literal
@@ -330,25 +364,71 @@ module Sql
       if r3
         r1 = r3
       else
-        s4, i4 = [], index
+        i4, s4 = index, []
+        i6, s6 = index, []
+        s7, i7 = [], index
         loop do
-          if input.index(Regexp.new('[._a-zA-Z0-9]'), index) == index
-            r5 = instantiate_node(SyntaxNode,input, index...(index + 1))
-            @index += 1
-          else
-            r5 = nil
-          end
-          if r5
-            s4 << r5
+          r8 = _nt_table_alias
+          if r8
+            s7 << r8
           else
             break
           end
         end
-        if s4.empty?
+        if s7.empty?
+          self.index = i7
+          r7 = nil
+        else
+          r7 = instantiate_node(SyntaxNode,input, i7...index, s7)
+        end
+        s6 << r7
+        if r7
+          if input.index('.', index) == index
+            r9 = instantiate_node(SyntaxNode,input, index...(index + 1))
+            @index += 1
+          else
+            terminal_parse_failure('.')
+            r9 = nil
+          end
+          s6 << r9
+        end
+        if s6.last
+          r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
+          r6.extend(Literal0)
+        else
+          self.index = i6
+          r6 = nil
+        end
+        if r6
+          r5 = r6
+        else
+          r5 = instantiate_node(SyntaxNode,input, index...index)
+        end
+        s4 << r5
+        if r5
+          s10, i10 = [], index
+          loop do
+            r11 = _nt_column_name
+            if r11
+              s10 << r11
+            else
+              break
+            end
+          end
+          if s10.empty?
+            self.index = i10
+            r10 = nil
+          else
+            r10 = instantiate_node(SyntaxNode,input, i10...index, s10)
+          end
+          s4 << r10
+        end
+        if s4.last
+          r4 = instantiate_node(SyntaxNode,input, i4...index, s4)
+          r4.extend(Literal1)
+        else
           self.index = i4
           r4 = nil
-        else
-          r4 = instantiate_node(SyntaxNode,input, i4...index, s4)
         end
         if r4
           r1 = r4
@@ -360,67 +440,136 @@ module Sql
     end
     s0 << r1
     if r1
-      s6, i6 = [], index
+      s12, i12 = [], index
       loop do
-        i7, s7 = index, []
-        r9 = _nt_space
-        if r9
-          r8 = r9
-        else
-          r8 = instantiate_node(SyntaxNode,input, index...index)
-        end
-        s7 << r8
-        if r8
-          r10 = _nt_operator
-          s7 << r10
-          if r10
-            r12 = _nt_space
-            if r12
-              r11 = r12
-            else
-              r11 = instantiate_node(SyntaxNode,input, index...index)
-            end
-            s7 << r11
-            if r11
-              r13 = _nt_literal
-              s7 << r13
-            end
-          end
-        end
-        if s7.last
-          r7 = instantiate_node(SyntaxNode,input, i7...index, s7)
-          r7.extend(Literal0)
-        else
-          self.index = i7
-          r7 = nil
-        end
-        if r7
-          s6 << r7
-        else
-          break
-        end
-      end
-      r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
-      s0 << r6
-      if r6
-        r15 = _nt_alias
+        i13, s13 = index, []
+        r15 = _nt_space
         if r15
           r14 = r15
         else
           r14 = instantiate_node(SyntaxNode,input, index...index)
         end
-        s0 << r14
+        s13 << r14
+        if r14
+          r16 = _nt_operator
+          s13 << r16
+          if r16
+            r18 = _nt_space
+            if r18
+              r17 = r18
+            else
+              r17 = instantiate_node(SyntaxNode,input, index...index)
+            end
+            s13 << r17
+            if r17
+              r19 = _nt_literal
+              s13 << r19
+            end
+          end
+        end
+        if s13.last
+          r13 = instantiate_node(SyntaxNode,input, i13...index, s13)
+          r13.extend(Literal2)
+        else
+          self.index = i13
+          r13 = nil
+        end
+        if r13
+          s12 << r13
+        else
+          break
+        end
+      end
+      r12 = instantiate_node(SyntaxNode,input, i12...index, s12)
+      s0 << r12
+      if r12
+        r21 = _nt_alias
+        if r21
+          r20 = r21
+        else
+          r20 = instantiate_node(SyntaxNode,input, index...index)
+        end
+        s0 << r20
       end
     end
     if s0.last
       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
-      r0.extend(Literal1)
+      r0.extend(Literal3)
+      r0.extend(Literal4)
     else
       self.index = i0
       r0 = nil
     end
 
     node_cache[:literal][start_index] = r0
+
+    return r0
+  end
+
+  def _nt_table_alias
+    start_index = index
+    if node_cache[:table_alias].has_key?(index)
+      cached = node_cache[:table_alias][index]
+      @index = cached.interval.end if cached
+      return cached
+    end
+
+    s0, i0 = [], index
+    loop do
+      if input.index(Regexp.new('[_a-zA-Z0-9]'), index) == index
+        r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
+        @index += 1
+      else
+        r1 = nil
+      end
+      if r1
+        s0 << r1
+      else
+        break
+      end
+    end
+    if s0.empty?
+      self.index = i0
+      r0 = nil
+    else
+      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+    end
+
+    node_cache[:table_alias][start_index] = r0
+
+    return r0
+  end
+
+  def _nt_column_name
+    start_index = index
+    if node_cache[:column_name].has_key?(index)
+      cached = node_cache[:column_name][index]
+      @index = cached.interval.end if cached
+      return cached
+    end
+
+    s0, i0 = [], index
+    loop do
+      if input.index(Regexp.new('[_a-zA-Z0-9]'), index) == index
+        r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
+        @index += 1
+      else
+        r1 = nil
+      end
+      if r1
+        s0 << r1
+      else
+        break
+      end
+    end
+    if s0.empty?
+      self.index = i0
+      r0 = nil
+    else
+      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+    end
+
+    node_cache[:column_name][start_index] = r0
 
     return r0
   end
@@ -447,6 +596,12 @@ module Sql
       elements[2]
     end
 
+  end
+
+  module Alias3
+    def alias
+      text_value.gsub /^(as|AS)\ ?/i
+    end
   end
 
   def _nt_alias
@@ -586,6 +741,7 @@ module Sql
     if s0.last
       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
       r0.extend(Alias2)
+      r0.extend(Alias3)
     else
       self.index = i0
       r0 = nil
@@ -617,6 +773,12 @@ module Sql
     return r0
   end
 
+  module Constant0
+    def name
+      '?column?'
+    end
+  end
+
   def _nt_constant
     start_index = index
     if node_cache[:constant].has_key?(index)
@@ -635,6 +797,7 @@ module Sql
         r0 = r2
       else
         r3 = _nt_numeric_constant
+        r3.extend(Constant0)
         if r3
           r0 = r3
         else

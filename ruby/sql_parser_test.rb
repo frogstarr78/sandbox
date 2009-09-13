@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'shoulda'
 require 'treetop'
-#gem 'shoulda'
 
 
 Treetop.load "sql"
@@ -17,7 +16,7 @@ class SqlParserTest < Test::Unit::TestCase
       'SELECT COUNT(*) FROM me;', 
       'SELECT a FROM me;', 
       'SELECT abc FROM me;', 
-      'SELECT a,b,c FROM me;', 
+      'SELECT a,b,c FROM me;',
       'SELECT acol, bcol, ccol FROM me;', 
       "SELECT a, 'a', b, c FROM me;", 
       %Q(
@@ -62,15 +61,105 @@ class SqlParserTest < Test::Unit::TestCase
       end
     end
 
+    context "parsing 'SELECT * FROM me;'" do
+      setup do
+        sql_fragment = 'SELECT * FROM me;'
+        @parsed = @parser.parse sql_fragment
+      end
+
+      should "have columns.to_a" do
+        assert_equal %w(*), @parsed.columns.to_array
+      end
+
+      should "have columns.to_s" do
+        assert_equal '*', @parsed.columns.to_s
+      end
+
+      should "parse" do
+        assert_not_nil @parsed
+      end
+    end
+
+    context "parsing 'SELECT a FROM me;'" do
+      setup do
+        sql_fragment = 'SELECT a FROM me;'
+        @parsed = @parser.parse sql_fragment
+      end
+
+      should "have columns.to_a" do
+        assert_equal %w(a), @parsed.columns.to_array
+      end
+
+      should "have columns.to_s" do
+        assert_equal 'a', @parsed.columns.to_s
+      end
+
+      should "parse" do
+        assert_not_nil @parsed
+      end
+    end
+
+#    context "parsing 'SELECT a,b,c FROM me;'" do
+#      setup do
+#        sql_fragment = 'SELECT a,b,c FROM me;'
+#        @parsed = @parser.parse sql_fragment
+#      end
+#
+#      should "have columns" do
+##        puts @parsed.columns.inspect
+#        puts @parsed.inspect
+##        puts @parsed.columns.elements.first.inspect
+##        puts @parsed.columns.elements.first.elements.first.inspect
+#        assert_equal %w(a b c), @parsed.columns
+##        to_a.inspect
+##        collect(&:text_value)
+#      end
+#
+#      should "parse" do
+#        assert_not_nil @parsed
+#      end
+#    end
+
     context "parsing simple operators" do
-      %w(|| + - * / < > = ~ ! @ # % ^ & | ` ?).each do |op|
-        should "handle 'SELECT 10#{op}2 FROM table;'" do
-          assert_not_nil @parser.parse("SELECT 10#{op}2 FROM table;")
+#      %w(|| + - * / < > = ~ ! @ # % ^ & | ` ?).each do |op|
+      %w(|| +).each do |op|
+        context "parsing 'SELECT 10#{op}2 FROM table;'" do
+          setup do
+            sql_fragment = "SELECT 10#{op}2 FROM table;"
+            @parsed = @parser.parse sql_fragment
+          end
+
+          should "not have alias?" do
+            assert !@parsed.columns.to_array.first.alias?
+          end
+
+#          should "populate columns" do
+#            assert_equal '?column?', @parsed.columns.name
+#          end
+
+          should "parse" do
+            assert_not_nil @parsed
+          end
         end
 
-        should "handle 'SELECT 10#{op}2 as alias FROM table;'" do
-          assert_not_nil @parser.parse("SELECT 10#{op}2 as alias FROM table;")
-        end
+#        context "parsing 'SELECT 10 #{op} 2 as alias FROM table;'" do
+#          setup do
+#            sql_fragment = "SELECT 10 #{op} 2 as alias FROM table;"
+#            @parsed = @parser.parse sql_fragment
+#          end
+#
+#          should "not have alias?" do
+#            assert @parsed.columns.to_a.first.alias?
+#          end
+#
+#          should "populate columns" do
+#            assert_equal 'alias', @parsed.columns.alias?.inspect
+#          end
+#
+#          should "parse" do
+#            assert_not_nil @parsed
+#          end
+#        end
       end
     end
 
