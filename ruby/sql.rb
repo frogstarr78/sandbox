@@ -1,9 +1,11 @@
 #  Column = OStruct.new
 #  Column.text = ''
-#  Column.name = '?column?'
-#  Column.alias = ''
+#  Column.alias = '?column?'
 #  Column.alias? = false
-#
+
+#  Table = OStruct.new
+#  Table.name
+
 #  SelectStatement = OStruct.new
 #  SelectStatement.columns = Column.new.to_a
 #  SelectStatement.table = 
@@ -189,13 +191,13 @@ module Sql
   end
 
   module Columns4
-    def to_s
-      text_value
-    end
-
-    def to_array
-      [self]
-    end
+    #      def to_s
+    #        text_value
+    #      end
+    #
+    #      def to_array
+    #        [self]
+    #      end
   end
 
   def _nt_columns
@@ -334,16 +336,6 @@ module Sql
   end
 
   module Literal3
-  end
-
-  module Literal4
-    def value
-      text_value.gsub /as/i
-    end
-
-#      def alias?
-#        text_value.include?( 'as' ) || text_value.include?( 'AS' )
-#      end
   end
 
   def _nt_literal
@@ -495,7 +487,6 @@ module Sql
     if s0.last
       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
       r0.extend(Literal3)
-      r0.extend(Literal4)
     else
       self.index = i0
       r0 = nil
@@ -596,12 +587,6 @@ module Sql
       elements[2]
     end
 
-  end
-
-  module Alias3
-    def alias
-      text_value.gsub /^(as|AS)\ ?/i
-    end
   end
 
   def _nt_alias
@@ -741,7 +726,6 @@ module Sql
     if s0.last
       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
       r0.extend(Alias2)
-      r0.extend(Alias3)
     else
       self.index = i0
       r0 = nil

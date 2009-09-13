@@ -1,11 +1,10 @@
 #  Column = OStruct.new
 #  Column.text = ''
-#  Column.name = '?column?'
-#  Column.alias = ''
+#  Column.alias = '?column?'
 #  Column.alias? = false
 
-Table = OStruct.new
-Table.name
+#  Table = OStruct.new
+#  Table.name
 
 #  SelectStatement = OStruct.new
 #  SelectStatement.columns = Column.new.to_a
@@ -22,46 +21,11 @@ grammar Sql
   end
 
   rule columns
-    '*' {
-      def to_s
-        text_value
-      end
-
-      def to_array
-        [text_value]
-      end
-    }
-    / literal+ (space? ',' space? literal)+ {
-      def to_s
-        self
-#        text_value.split ','
-      end
-
-      def to_array
-        self.elements.collect(&:text_value)
-      end
-    }
-    / literal {
-      def to_s
-        text_value
-      end
-
-      def to_array
-        [self]
-      end
-    }
+    '*' / literal+ (space? ',' space? literal)+ / literal
   end
 
   rule literal
-    (  constant / function_call / ( table_alias+ '.' )? column_name+ ) (space? operator space? literal)* alias? {
-      def value
-        text_value.gsub /as/i
-      end
-
-#      def alias?
-#        text_value.include?( 'as' ) || text_value.include?( 'AS' )
-#      end
-    }
+    (  constant / function_call / ( table_alias+ '.' )? column_name+ ) (space? operator space? literal)* alias? 
   end
 
   rule table_alias
@@ -73,11 +37,7 @@ grammar Sql
   end
 
   rule alias
-    space ('AS' / 'as') space ( quote_literal ( !quote_literal [ _a-zA-Z0-9] )+ quote_literal / [_a-zA-Z0-9]+ ) {
-      def alias
-        text_value.gsub /^(as|AS)\ ?/i
-      end
-    }
+    space ('AS' / 'as') space ( quote_literal ( !quote_literal [ _a-zA-Z0-9] )+ quote_literal / [_a-zA-Z0-9]+ ) 
   end
 
   rule quote_literal
@@ -97,11 +57,7 @@ grammar Sql
   end
 
   rule quote_val
-    "'" / '$' ( !'$' . )* '$' {
-      def tag_name
-        text_value
-      end
-    }
+    "'" / '$' ( !'$' . )* '$' 
   end
 
   rule bit_constant

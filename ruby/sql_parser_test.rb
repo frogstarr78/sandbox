@@ -61,26 +61,49 @@ class SqlParserTest < Test::Unit::TestCase
       end
     end
 
-    context "parsing 'SELECT * FROM me;'" do
-      setup do
-        sql_fragment = 'SELECT * FROM me;'
-        @parsed = @parser.parse sql_fragment
-      end
+#    context "parsing 'SELECT * FROM me;'" do
+#      setup do
+#        sql_fragment = 'SELECT * FROM me;'
+#        @parsed = @parser.parse sql_fragment
+#      end
+#
+#      should "have columns.to_a" do
+#        assert_equal %w(*), @parsed.columns.to_array
+#      end
+#
+#      should "have columns.to_s" do
+#        assert_equal '*', @parsed.columns.to_s
+#      end
+#
+#      should "parse" do
+#        assert_not_nil @parsed
+#      end
+#    end
 
-      should "have columns.to_a" do
-        assert_equal %w(*), @parsed.columns.to_array
-      end
+#    context "parsing 'SELECT a FROM me;'" do
+#      setup do
+#        sql_fragment = 'SELECT a FROM me;'
+#        @parsed = @parser.parse sql_fragment
+#      end
+#
+#      should "have columns.to_a" do
+#        assert_equal %w(a), @parsed.columns.to_array
+#      end
+#
+#      should "have columns.to_s" do
+#        assert_equal 'a', @parsed.columns.to_s
+#      end
+#
+#      should "not have an alias" do
+#        assert @parsed.columns.alias?
+#      end
+#
+#      should "parse" do
+#        assert_not_nil @parsed
+#      end
+#    end
 
-      should "have columns.to_s" do
-        assert_equal '*', @parsed.columns.to_s
-      end
-
-      should "parse" do
-        assert_not_nil @parsed
-      end
-    end
-
-    context "parsing 'SELECT a FROM me;'" do
+    context "parsing 'SELECT a AS col FROM me;'" do
       setup do
         sql_fragment = 'SELECT a FROM me;'
         @parsed = @parser.parse sql_fragment
@@ -92,6 +115,11 @@ class SqlParserTest < Test::Unit::TestCase
 
       should "have columns.to_s" do
         assert_equal 'a', @parsed.columns.to_s
+      end
+
+      should "have an alias" do
+        puts 'columns ', @parsed.columns.inspect
+        assert @parsed.columns.alias?
       end
 
       should "parse" do
@@ -120,62 +148,62 @@ class SqlParserTest < Test::Unit::TestCase
 #      end
 #    end
 
-    context "parsing simple operators" do
-#      %w(|| + - * / < > = ~ ! @ # % ^ & | ` ?).each do |op|
-      %w(|| +).each do |op|
-        context "parsing 'SELECT 10#{op}2 FROM table;'" do
-          setup do
-            sql_fragment = "SELECT 10#{op}2 FROM table;"
-            @parsed = @parser.parse sql_fragment
-          end
-
-          should "not have alias?" do
-            assert !@parsed.columns.to_array.first.alias?
-          end
-
-#          should "populate columns" do
-#            assert_equal '?column?', @parsed.columns.name
-#          end
-
-          should "parse" do
-            assert_not_nil @parsed
-          end
-        end
-
-#        context "parsing 'SELECT 10 #{op} 2 as alias FROM table;'" do
+#    context "parsing simple operators" do
+##      %w(|| + - * / < > = ~ ! @ # % ^ & | ` ?).each do |op|
+#      %w(|| +).each do |op|
+#        context "parsing 'SELECT 10#{op}2 FROM table;'" do
 #          setup do
-#            sql_fragment = "SELECT 10 #{op} 2 as alias FROM table;"
+#            sql_fragment = "SELECT 10#{op}2 FROM table;"
 #            @parsed = @parser.parse sql_fragment
 #          end
 #
 #          should "not have alias?" do
-#            assert @parsed.columns.to_a.first.alias?
+#            assert !@parsed.columns.to_array.first.alias?
 #          end
 #
-#          should "populate columns" do
-#            assert_equal 'alias', @parsed.columns.alias?.inspect
-#          end
+##          should "populate columns" do
+##            assert_equal '?column?', @parsed.columns.name
+##          end
 #
 #          should "parse" do
 #            assert_not_nil @parsed
 #          end
 #        end
-      end
-    end
+#
+##        context "parsing 'SELECT 10 #{op} 2 as alias FROM table;'" do
+##          setup do
+##            sql_fragment = "SELECT 10 #{op} 2 as alias FROM table;"
+##            @parsed = @parser.parse sql_fragment
+##          end
+##
+##          should "not have alias?" do
+##            assert @parsed.columns.to_a.first.alias?
+##          end
+##
+##          should "populate columns" do
+##            assert_equal 'alias', @parsed.columns.alias?.inspect
+##          end
+##
+##          should "parse" do
+##            assert_not_nil @parsed
+##          end
+##        end
+#      end
+#    end
 
-    context "parsing complex operator expression" do
-      should "parse 'SELECT 10*2/5-1^3 FROM t;'" do
-          assert @parser.parse("SELECT 10*2/5-1^3 FROM t;")
-      end
-
-      should "parse 'SELECT 10 * t.value / 5 - t.offset ^ 3 FROM t;'" do
-          assert @parser.parse("SELECT 10 * t.value / 5 - t.offset ^ 3 FROM t;")
-      end
-
-      should "parse 'SELECT 10 * t.value / 5 - t.offset ^ 3 as a_prettier_name FROM t;'" do
-          assert_not_nil @parser.parse("SELECT 10 * t.value as a_prettier_name FROM t;")
-      end
-    end
+#    context "parsing complex operator expression" do
+#      should "parse 'SELECT 10*2/5-1^3 FROM t;'" do
+#          assert @parser.parse("SELECT 10*2/5-1^3 FROM t;")
+#      end
+#
+#      should "parse 'SELECT 10 * t.value / 5 - t.offset ^ 3 FROM t;'" do
+#          assert @parser.parse("SELECT 10 * t.value / 5 - t.offset ^ 3 FROM t;")
+#      end
+#
+#      should "parse 'SELECT 10 * t.value / 5 - t.offset ^ 3 as a_prettier_name FROM t;'" do
+#          assert_not_nil @parser.parse("SELECT 10 * t.value as a_prettier_name FROM t;")
+#      end
+#    end
 
   end
 end
