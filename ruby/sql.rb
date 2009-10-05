@@ -161,43 +161,12 @@ module Sql
   end
 
   module Columns0
-    def to_s
-      text_value
-    end
-
-    def to_array
-      [text_value]
-    end
-  end
-
-  module Columns1
     def literal
       elements[3]
     end
   end
 
-  module Columns2
-  end
-
-  module Columns3
-    def to_s
-      self
-#        text_value.split ','
-    end
-
-    def to_array
-      self.elements.collect(&:text_value)
-    end
-  end
-
-  module Columns4
-    #      def to_s
-    #        text_value
-    #      end
-    #
-    #      def to_array
-    #        [self]
-    #      end
+  module Columns1
   end
 
   def _nt_columns
@@ -211,7 +180,6 @@ module Sql
     i0 = index
     if input.index('*', index) == index
       r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
-      r1.extend(Columns0)
       @index += 1
     else
       terminal_parse_failure('*')
@@ -273,7 +241,7 @@ module Sql
           end
           if s6.last
             r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
-            r6.extend(Columns1)
+            r6.extend(Columns0)
           else
             self.index = i6
             r6 = nil
@@ -294,8 +262,7 @@ module Sql
       end
       if s2.last
         r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
-        r2.extend(Columns2)
-        r2.extend(Columns3)
+        r2.extend(Columns1)
       else
         self.index = i2
         r2 = nil
@@ -304,7 +271,6 @@ module Sql
         r0 = r2
       else
         r13 = _nt_literal
-        r13.extend(Columns4)
         if r13
           r0 = r13
         else
@@ -360,7 +326,7 @@ module Sql
         i6, s6 = index, []
         s7, i7 = [], index
         loop do
-          r8 = _nt_table_alias
+          r8 = _nt_name_literal
           if r8
             s7 << r8
           else
@@ -400,7 +366,7 @@ module Sql
         if r5
           s10, i10 = [], index
           loop do
-            r11 = _nt_column_name
+            r11 = _nt_name_literal
             if r11
               s10 << r11
             else
@@ -497,10 +463,10 @@ module Sql
     return r0
   end
 
-  def _nt_table_alias
+  def _nt_name_literal
     start_index = index
-    if node_cache[:table_alias].has_key?(index)
-      cached = node_cache[:table_alias][index]
+    if node_cache[:name_literal].has_key?(index)
+      cached = node_cache[:name_literal][index]
       @index = cached.interval.end if cached
       return cached
     end
@@ -526,41 +492,7 @@ module Sql
       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
     end
 
-    node_cache[:table_alias][start_index] = r0
-
-    return r0
-  end
-
-  def _nt_column_name
-    start_index = index
-    if node_cache[:column_name].has_key?(index)
-      cached = node_cache[:column_name][index]
-      @index = cached.interval.end if cached
-      return cached
-    end
-
-    s0, i0 = [], index
-    loop do
-      if input.index(Regexp.new('[_a-zA-Z0-9]'), index) == index
-        r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
-        @index += 1
-      else
-        r1 = nil
-      end
-      if r1
-        s0 << r1
-      else
-        break
-      end
-    end
-    if s0.empty?
-      self.index = i0
-      r0 = nil
-    else
-      r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
-    end
-
-    node_cache[:column_name][start_index] = r0
+    node_cache[:name_literal][start_index] = r0
 
     return r0
   end
@@ -797,16 +729,6 @@ module Sql
   end
 
   module StringConstant0
-    def concat_op
-      elements[1]
-    end
-
-    def literal
-      elements[3]
-    end
-  end
-
-  module StringConstant1
     def quote_val
       elements[0]
     end
@@ -814,7 +736,6 @@ module Sql
     def quote_val
       elements[2]
     end
-
   end
 
   def _nt_string_constant
@@ -853,55 +774,11 @@ module Sql
       if r2
         r4 = _nt_quote_val
         s0 << r4
-        if r4
-          s5, i5 = [], index
-          loop do
-            i6, s6 = index, []
-            r8 = _nt_space
-            if r8
-              r7 = r8
-            else
-              r7 = instantiate_node(SyntaxNode,input, index...index)
-            end
-            s6 << r7
-            if r7
-              r9 = _nt_concat_op
-              s6 << r9
-              if r9
-                r11 = _nt_space
-                if r11
-                  r10 = r11
-                else
-                  r10 = instantiate_node(SyntaxNode,input, index...index)
-                end
-                s6 << r10
-                if r10
-                  r12 = _nt_literal
-                  s6 << r12
-                end
-              end
-            end
-            if s6.last
-              r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
-              r6.extend(StringConstant0)
-            else
-              self.index = i6
-              r6 = nil
-            end
-            if r6
-              s5 << r6
-            else
-              break
-            end
-          end
-          r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
-          s0 << r5
-        end
       end
     end
     if s0.last
       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
-      r0.extend(StringConstant1)
+      r0.extend(StringConstant0)
     else
       self.index = i0
       r0 = nil
@@ -916,12 +793,6 @@ module Sql
   end
 
   module QuoteVal1
-  end
-
-  module QuoteVal2
-    def tag_name
-      text_value
-    end
   end
 
   def _nt_quote_val
@@ -1010,7 +881,6 @@ module Sql
       if s2.last
         r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
         r2.extend(QuoteVal1)
-        r2.extend(QuoteVal2)
       else
         self.index = i2
         r2 = nil

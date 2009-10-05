@@ -13,10 +13,10 @@ grammar Arithmetic
 
   rule multitive
     primary '*' multitive { 
-	  def value
-	    primary.value * multitive.value
-	  end
-	} / primary
+      def value
+        primary.value * multitive.value
+      end
+    } / primary
   end
 
   rule mult_op
@@ -24,13 +24,17 @@ grammar Arithmetic
   end
 
   rule primary
-    '(' additive ')' / number
+    '(' additive ')' {
+      def value
+        additive.value
+      end
+    } / number
   end
 
   rule number
     [1-9] [0-9]* { 
 	  def value
-	    number
+	    text_value.to_i
 	  end
 	}
   end

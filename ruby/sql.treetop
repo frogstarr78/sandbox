@@ -25,14 +25,10 @@ grammar Sql
   end
 
   rule literal
-    (  constant / function_call / ( table_alias+ '.' )? column_name+ ) (space? operator space? literal)* alias? 
+    (  constant / function_call / ( name_literal+ '.' )? name_literal+ ) (space? operator space? literal)* alias? 
   end
 
-  rule table_alias
-    [_a-zA-Z0-9]+
-  end
-
-  rule column_name
+  rule name_literal
     [_a-zA-Z0-9]+
   end
 
@@ -53,7 +49,7 @@ grammar Sql
   end
 
   rule string_constant
-    quote_val [\ ,"_a-zA-Z0-9]+ quote_val ( space? concat_op space? literal )*
+    quote_val [\ ,"_a-zA-Z0-9]+ quote_val
   end
 
   rule quote_val

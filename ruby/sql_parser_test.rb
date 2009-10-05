@@ -103,14 +103,15 @@ class SqlParserTest < Test::Unit::TestCase
 #      end
 #    end
 
-    context "parsing 'SELECT a AS col FROM me;'" do
+    context "parsing 'SELECT a,b,c FROM me;'" do
       setup do
-        sql_fragment = 'SELECT a FROM me;'
+        sql_fragment = 'SELECT a,b,c FROM me;'
         @parsed = @parser.parse sql_fragment
+        puts @parsed.inspect
       end
 
       should "have columns.to_a" do
-        assert_equal %w(a), @parsed.columns.to_array
+        assert_equal %w(a), @parsed.columns.to_a
       end
 
       should "have columns.to_s" do
@@ -118,7 +119,6 @@ class SqlParserTest < Test::Unit::TestCase
       end
 
       should "have an alias" do
-        puts 'columns ', @parsed.columns.inspect
         assert @parsed.columns.alias?
       end
 
@@ -127,6 +127,29 @@ class SqlParserTest < Test::Unit::TestCase
       end
     end
 
+#    context "parsing 'SELECT a AS col FROM me;'" do
+#      setup do
+#        sql_fragment = 'SELECT a AS col FROM me;'
+#        @parsed = @parser.parse sql_fragment
+#      end
+#
+#      should "have columns.to_a" do
+#        assert_equal %w(a), @parsed.columns.to_a
+#      end
+#
+#      should "have columns.to_s" do
+#        assert_equal 'a', @parsed.columns.to_s
+#      end
+#
+#      should "have an alias" do
+#        assert @parsed.columns.alias?
+#      end
+#
+#      should "parse" do
+#        assert_not_nil @parsed
+#      end
+#    end
+
 #    context "parsing 'SELECT a,b,c FROM me;'" do
 #      setup do
 #        sql_fragment = 'SELECT a,b,c FROM me;'
@@ -134,13 +157,7 @@ class SqlParserTest < Test::Unit::TestCase
 #      end
 #
 #      should "have columns" do
-##        puts @parsed.columns.inspect
-#        puts @parsed.inspect
-##        puts @parsed.columns.elements.first.inspect
-##        puts @parsed.columns.elements.first.elements.first.inspect
 #        assert_equal %w(a b c), @parsed.columns
-##        to_a.inspect
-##        collect(&:text_value)
 #      end
 #
 #      should "parse" do

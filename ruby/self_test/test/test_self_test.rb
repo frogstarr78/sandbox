@@ -57,11 +57,11 @@ class TestSelfTest < Test::Unit::TestCase
   end
 
   def test_false_is_false
-    assert false.false?
+    false.false?
   end
 
   def test_false_is_not_true
-    assert !false.true?
+    !false.true?
   end
 
   context "I" do
@@ -69,12 +69,12 @@ class TestSelfTest < Test::Unit::TestCase
     end
 
     should "error when includes? is called without a module" do
-#      assert_nothing_raised {
-        self.includes? FalseClass, :raises => TypeError
-#      }
+      assert_raise( TypeError ) {
+        self.includes? false.class
+      }
     end
 
-    should "extend? SelfTest" do
+    should "includes? SelfTest" do
       assert_nothing_raised {
         self.includes? SelfTest
       }
@@ -82,6 +82,12 @@ class TestSelfTest < Test::Unit::TestCase
 
     should "respond_to? responds_to?" do
       self.responds_to? :responds_to?
+    end
+  end
+
+  context FailureToInclude do
+    should "not include? a new module" do
+      FailureToInclude.new.includes? eval('module Mod; end')
     end
   end
 end

@@ -39,8 +39,11 @@ module SelfTest
       end
     } 
 
-    def includes? a_module
-      self.class.included_modules.include? a_module
+    def includes? a_module, optional_raises = {}
+      raise TypeError if a_module.respond_to? :superclass
+      assert_block {
+        self.class.included_modules.include? a_module
+      }
     end
 
     def responds_to? message

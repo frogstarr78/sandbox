@@ -104,10 +104,10 @@ module Arithmetic
   end
 
   module Multitive1
- 
-	  def value
-	    primary.value * multitive.value
-	  end
+
+    def value
+      primary.value * multitive.value
+    end
   end
 
   def _nt_multitive
@@ -189,6 +189,12 @@ module Arithmetic
 
   end
 
+  module Primary1
+    def value
+      additive.value
+    end
+  end
+
   def _nt_primary
     start_index = index
     if node_cache[:primary].has_key?(index)
@@ -224,6 +230,7 @@ module Arithmetic
     if s1.last
       r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
       r1.extend(Primary0)
+      r1.extend(Primary1)
     else
       self.index = i1
       r1 = nil
@@ -251,7 +258,7 @@ module Arithmetic
   module Number1
  
 	  def value
-	    number
+	    text_value.to_i
 	  end
   end
 

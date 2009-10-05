@@ -20,26 +20,51 @@ end
 #	pack('side'=>'left', 'padx'=>10, 'pady'=>10)  
 #end
 
-bar = TkMenu.new() 
+#bar = TkMenu.new() 
+#
+#file = TkMenu.new(bar) 
+#file.add('command', :label => "Open",   :command => proc { puts "Open..." }) 
+#file.add('command', :label => "Close",  :command => proc { puts "Close..." }) 
+#file.add(:separator) 
+#file.add('command', :label => "Quit",   :command => proc { root.destroy }) 
+#
+#sys = TkMenu.new(bar) 
+#sys.add('command',  :label => "Quit",     :command => proc { root.destroy }) 
+#
+#bar.add('cascade',  :label => "File",   :menu => file) 
+#bar.add('cascade',  :label => "System", :menu => sys) 
+#
+#root.menu(bar)
 
-file = TkMenu.new(bar) 
-file.add('command', :label => "Open",   :command => proc { puts "Open..." }) 
-file.add('command', :label => "Close",  :command => proc { puts "Close..." }) 
-file.add(:separator) 
-file.add('command', :label => "Quit",   :command => proc { root.destroy }) 
+#pwin = TkPanedWindow.new do
+#	orient :vertical
+#	relief :groove
+#	pack :side => 'left'
+#end
 
-sys = TkMenu.new(bar) 
-sys.add('command',  :label => "Quit",     :command => proc { root.destroy }) 
+class HelloWorld < TkRoot
+  def initialize parent = nil, keys = nil
+    title 'Hello World'
+    width = 200
 
-bar.add('cascade',  :label => "File",   :menu => file) 
-bar.add('cascade',  :label => "System", :menu => sys) 
+    bar = TkMenu.new() 
 
-root.menu(bar)
+    file = TkMenu.new(bar) 
+    file.add('command', :label => "Open",   :command => proc { puts "Open..." }) 
+    file.add('command', :label => "Close",  :command => proc { puts "Close..." }) 
+    file.add(:separator) 
+    file.add('command', :label => "Quit",   :command => proc { root.destroy }) 
 
-pwin = TkPanedWindow.new do
-	orient :vertical
-	relief :groove
-	pack :side => 'left'
+    sys = TkMenu.new(bar) 
+    sys.add('command',  :label => "Quit",     :command => proc { root.destroy }) 
+
+    bar.add('cascade',  :label => "File",   :menu => file) 
+    bar.add('cascade',  :label => "System", :menu => sys) 
+    bar.pack
+
+    menu bar
+  end
 end
 
+#HelloWorld.new
 Tk.mainloop
