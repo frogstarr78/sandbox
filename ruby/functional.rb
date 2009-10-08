@@ -53,18 +53,33 @@ end
 #puts fac 5
 
 class Functional
-  attr_accessor :result
-  define_method "==" do |result|
-    @result = result
+
+  def fac n
+    case n
+    when 0
+      return fac_0 
+    else
+      return fac_n n
+    end
   end
 
-  def define method, *arguments
+  def define method, *arguments, &block
     new_method_name = [method, arguments].flatten.join '_'
- 
-    self.class.send :define_method, new_method_name do
+    if block.arity <= 0 
+      self.class.send :define_method, new_method_name do
+        yield
+      end
+    else
+      self.class.send :define_method, new_method_name do |n|
+        block.call(n)
+#        n * fac(n-1)
+      end
     end
   end
 end
 
 f = Functional.new
-f.define(:fac, 0) == 1
+f.define(:fac, 0) { 1 }
+f.define(:fac, :n) {|n| n*f.fac(n-1) }
+puts f.fac 0
+puts f.fac 4
