@@ -179,17 +179,14 @@ end
 class Functional < SimpleDelegator
   attr_accessor :which
   def initialize
-    @which  = {
-#      [:fac, 0] => proc { 1 },
-#      [:fac, Integer] => proc {|n| n * fac(n-1) },
-    }
+    @which  = { }
     super @which
   end
 
   def define base_name, arguments, &block
     unless self.respond_to? base_name
       self.class.send :define_method, base_name do |*arguments|
-        my_lambda = find( :fac, *arguments )
+        my_lambda = find( base_name, *arguments )
         __setobj__ my_lambda
         my_lambda.call(*arguments)
       end 
@@ -211,8 +208,20 @@ end
 
 f = Functional.new
 f.define( :fac, 0 ) { 1 }
-f.define( :fac, 1 ) { 2 }
 f.define( :fac, Fixnum ) {|n| n * f.fac(n-1) }
 puts f.fac 0
-puts f.fac 1
 puts f.fac 4
+
+
+f = Functional.new
+f.define( :fib, 1 ) { 1 }
+f.define( :fib, 2 ) { 1 }
+f.define( :fib, Fixnum ) {|n| f.fib(n-1) + f.fib(n-2) }
+
+puts f.fib 1
+puts f.fib 2
+puts f.fib 3
+puts f.fib 4
+puts f.fib 5
+puts f.fib 6
+puts f.fib 7
