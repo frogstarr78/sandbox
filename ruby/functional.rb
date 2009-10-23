@@ -138,51 +138,81 @@ end
 
 require 'delegate'
 
-class FacN < DelegateClass(Proc)
+module DelegateFunctional
+  class Functional < SimpleDelegator
+    def initialize
+  #    @which = SimpleDelegator.new([])
+      @fac_0 = proc { 1 }
+      @fac_Integer = proc {|n| n * fac(n-1) }
+      super @fac_0
+    end
+
+    def fac n
+      my_lambda = instance_variable_get( "@fac_#{n == 0 ? 0 : Integer}" )
+      __setobj__ my_lambda
+      my_lambda.call(n)
+  #    @which.__setobj__( my_lambda )
+  #    @which.call
+    end
+
+  #  def define method_name, argument, &block
+  #    unless self.respond_to? method_name
+  #      self.class.send :define_method, method_name do |*arguments|
+  #        @which.__setobj__ argument
+  #      end
+  #    end
+  #    new_method_name = [method_name, argument].join '_'
+  #    self.class.send :define_method, new_method_name do
+  #      yield
+  #    end
+  #  end
+  end
 end
-class Fac0 < DelegateClass(Proc)
-end
+
+#f = Functional.new
+##f.define(:fac, 0) { 1 }
+##f.define(:fac, :n) {|n| n * f.fac(n-1) }
+#puts f.fac 0
+#puts f.fac 4
+
 
 class Functional < SimpleDelegator
+  attr_accessor :which
   def initialize
-#    @which = SimpleDelegator.new([])
-    @fac_0 = proc { 1 }
-    @fac_n = proc {|n| n * fac(n-1) }
-    super @fac_0
+    @which  = {
+#      [:fac, 0] => proc { 1 },
+#      [:fac, Integer] => proc {|n| n * fac(n-1) },
+    }
+    super @which
   end
 
-#  def fac n
-#    case n
-#    when 0
-#      1
-#    else
-#      n * fac( n - 1)
-#    end
-#  end
-
-  def fac n
-    my_lambda = instance_variable_get( "@fac_#{n == 0 ? 0 : 'n'}" )
-    __setobj__ my_lambda
-    my_lambda.call(n)
-#    @which.__setobj__( my_lambda )
-#    @which.call
+  def define base_name, arguments, &block
+    unless self.respond_to? base_name
+      self.class.send :define_method, base_name do |*arguments|
+        my_lambda = find( :fac, *arguments )
+        __setobj__ my_lambda
+        my_lambda.call(*arguments)
+      end 
+    end
+    raise "already defined #{base_name}(#{arguments})" if find(base_name, *arguments)
+    @which.update [base_name, arguments].flatten => block
   end
 
-#  def define method_name, argument, &block
-#    unless self.respond_to? method_name
-#      self.class.send :define_method, method_name do |*arguments|
-#        @which.__setobj__ argument
-#      end
-#    end
-#    new_method_name = [method_name, argument].join '_'
-#    self.class.send :define_method, new_method_name do
-#      yield
-#    end
-#  end
+  private 
+    def find base_name, *arguments
+      begin
+        @which.fetch [base_name, arguments].flatten
+      rescue IndexError
+        argument_classes = arguments.collect {|argument| argument.class }
+        @which[[base_name, argument_classes].flatten]
+      end
+    end
 end
 
 f = Functional.new
-#f.define(:fac, 0) { 1 }
-#f.define(:fac, :n) {|n| n * f.fac(n-1) }
+f.define( :fac, 0 ) { 1 }
+f.define( :fac, 1 ) { 2 }
+f.define( :fac, Fixnum ) {|n| n * f.fac(n-1) }
 puts f.fac 0
+puts f.fac 1
 puts f.fac 4
