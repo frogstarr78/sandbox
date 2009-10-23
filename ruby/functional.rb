@@ -52,53 +52,137 @@ end
 #puts fac 4
 #puts fac 5
 
-class Functional
-  attr_accessor :methods
-#  private.methods
+module OneFormDynamic
+  class Functional
+    attr_accessor :methods
+  #  private.methods
 
-  def initialize
-    @methods = {}
-  end
-
-#  def fac n
-#    case n
-#    when 0
-#      return fac_0 
-#    else
-#      return fac_n n
-#    end
-#  end
-  def fac n
-    self.methods
-    case n
-      when 0
-        return self.methods[0].call
-      when n
-        return self.methods[:n].call n
+    def initialize
+      @methods = {}
     end
-  end
 
-  def define method, *arguments, &block
-    new_method_name = [method, arguments].flatten.join '_'
+  #  def fac n
+  #    case n
+  #    when 0
+  #      return fac_0 
+  #    else
+  #      return fac_n n
+  #    end
+  #  end
+   
+    def fac n
+      return self.methods[n].call n
+    end
 
-    if arguments.first == :n
-      self.methods.default = self.class.send :define_method, new_method_name do |n|
-        block.call(n)
+    def define method, *arguments, &block
+      new_method_name = [method, arguments].flatten.join '_'
+
+      if arguments.first == :n
+        self.methods.default = self.class.send :define_method, new_method_name do |n|
+          yield n
+        end
       end
-    end
 
-    if block.arity <= 0 
-      self.methods[arguments.first] = self.class.send :define_method, new_method_name do
-        yield
+      if block.arity <= 0 
+        self.methods[arguments.first] = self.class.send :define_method, new_method_name do
+          yield
+        end
       end
     end
   end
 end
 
+#f = Functional.new
+#f.define(:fac, 0) { 1 }
+#f.define(:fac, :n) {|n| n * f.fac(n-1) }
+#puts f.fac 0
+#puts f.fac 4
+
+#fac = lambda {|n| 
+#}
+#fac_0 = lambda { 1 }
+#fac_n = lambda {|n| n * fac.call(n-1) }
+#fac = lambda {|n| 
+#  case n
+#  when 0
+#    return fac_0.call n
+#  else
+#    return fac_n.call n
+#  end
+#}
+
+#puts fac.call 0
+#puts fac.call 4
+
+#class Pratt
+#
+#  def cli argument
+#    instance_eval &argument
+#  end
+#
+#  def console 
+#    exec "irb"
+#  end
+#  def graph  
+#    puts 'graphing'
+#  end
+#
+#end
+#
+##graph.call
+##console.call
+#p = Pratt.new
+#p.cli :graph
+#p.cli :bob
+#p.cli :console
+
+require 'delegate'
+
+class FacN < DelegateClass(Proc)
+end
+class Fac0 < DelegateClass(Proc)
+end
+
+class Functional < SimpleDelegator
+  def initialize
+#    @which = SimpleDelegator.new([])
+    @fac_0 = proc { 1 }
+    @fac_n = proc {|n| n * fac(n-1) }
+    super @fac_0
+  end
+
+#  def fac n
+#    case n
+#    when 0
+#      1
+#    else
+#      n * fac( n - 1)
+#    end
+#  end
+
+  def fac n
+    my_lambda = instance_variable_get( "@fac_#{n == 0 ? 0 : 'n'}" )
+    __setobj__ my_lambda
+    my_lambda.call(n)
+#    @which.__setobj__( my_lambda )
+#    @which.call
+  end
+
+#  def define method_name, argument, &block
+#    unless self.respond_to? method_name
+#      self.class.send :define_method, method_name do |*arguments|
+#        @which.__setobj__ argument
+#      end
+#    end
+#    new_method_name = [method_name, argument].join '_'
+#    self.class.send :define_method, new_method_name do
+#      yield
+#    end
+#  end
+end
+
 f = Functional.new
-f.define(:fac, 0) { 1 }
-f.define(:fac, :n) {|n| n * f.fac(n-1) }
+#f.define(:fac, 0) { 1 }
+#f.define(:fac, :n) {|n| n * f.fac(n-1) }
 puts f.fac 0
 puts f.fac 4
-#puts f.methods.inspect
-#puts f.methods[4].call
