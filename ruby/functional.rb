@@ -191,11 +191,16 @@ class Functional < SimpleDelegator
         my_lambda.call(*arguments)
       end 
     end
-    raise "already defined #{base_name}(#{arguments})" if find(base_name, *arguments)
+    has_lambda = find(base_name, *arguments)
+    raise "already defined #{base_name}(#{arguments}) yielding #{has_lambda.call(*arguments)}" if has_lambda
     @which.update [base_name, arguments].flatten => block
   end
 
   private 
+    def has?
+     find(base_name, *arguments)
+    end
+
     def find base_name, *arguments
       begin
         @which.fetch [base_name, arguments].flatten
