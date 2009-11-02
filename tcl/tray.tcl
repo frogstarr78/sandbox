@@ -34,19 +34,43 @@ proc calculate {} {
 }
 
 proc show_me {} {
-#	puts array names [list [.tracon bbox]]
-#	set leftTopRightBot [.tracon bbox]
-	set left [expr {[lindex [.tracon bbox] 0] - 300}]
-	set top [expr {[lindex [.tracon bbox] 1] + 19}]
-	puts [list [winfo screenwidth .] [winfo screenheight .]]
+	set width 300
+	set height 100
+	set iconWidth 20
+	set iconHeight 20
+	set maxWidth [winfo screenwidth .] 
+	set maxHeight [winfo screenheight .]
+
+	set left [lindex [.tracon bbox] 0]
+	if { [expr {$left + $width}] > $maxWidth } {
+		set left [expr {$left - $iconWidth - $width}]	
+	}
+#	if {$left > [expr {$maxWidth / 2}]} {
+##		set left [expr {$left - $width}]
+#	} else {
+##		set left [expr {$left + 19}]
+#	}
+
+	set top [lindex [.tracon bbox] 1]
+	if { [expr {$top + $height}] > $maxHeight} {
+		set top [expr {$top - $iconHeight - $height}]	
+	}
+#	if {$top > [expr {$maxHeight / 2}]} {
+##		set top [expr {$top - $height}]
+#	} else {
+#	}
+
+	puts "$maxWidth $maxHeight"
 	puts "$left $top"
 	tk::toplevel .topper
-	wm title .topper "What say you?"
-	wm geometry .topper "300x200+$left+$top"
+#	wm title .topper "What say you?"
+	wm geometry .topper "${width}x$height+$left+$top"
 	grid columnconfigure .topper 0 -weight 1
 	grid rowconfigure .topper 0 -weight 1
 
 	grid [ttk::label .topper.little -text "Little"] -column 0 -row 0 
 	grid [ttk::label .topper.bigger -text "Much Bigger Label"] -column 0 -row 0
-	after 2000 raise .topper.little
+#	after 2000 raise .topper.little
+
+	bind .topper <Control-w> {destroy .topper}
 }
