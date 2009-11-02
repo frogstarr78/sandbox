@@ -4,8 +4,8 @@ package require tktray 1.1
 wm title . "Feet to Meters" 
 grid [ttk::frame .c -padding "3 3 12 12"] -column 0 -row 0 -sticky nwes
 grid columnconfigure . 0 -weight 1
-
 grid rowconfigure . 0 -weight 1
+
 grid [ttk::entry .c.feet -width 7 -textvariable feet] -column 2 -row 1 -sticky we
 grid [ttk::label .c.meters -textvariable meters] -column 2 -row 2 -sticky we
 
@@ -23,6 +23,7 @@ bind . <Return> {calculate}
 bind . <Control-q> {exit}
 
 tktray::icon .tracon -image [image create photo imgobj -file "working.gif"]
+bind .tracon <1> {show_me}
 
 proc calculate {} {
 	if {[catch {
@@ -30,4 +31,22 @@ proc calculate {} {
 	}]!=0} {
 		set ::meters ""
 	} 
+}
+
+proc show_me {} {
+#	puts array names [list [.tracon bbox]]
+#	set leftTopRightBot [.tracon bbox]
+	set left [expr {[lindex [.tracon bbox] 0] - 300}]
+	set top [expr {[lindex [.tracon bbox] 1] + 19}]
+	puts [list [winfo screenwidth .] [winfo screenheight .]]
+	puts "$left $top"
+	tk::toplevel .topper
+	wm title .topper "What say you?"
+	wm geometry .topper "300x200+$left+$top"
+	grid columnconfigure .topper 0 -weight 1
+	grid rowconfigure .topper 0 -weight 1
+
+	grid [ttk::label .topper.little -text "Little"] -column 0 -row 0 
+	grid [ttk::label .topper.bigger -text "Much Bigger Label"] -column 0 -row 0
+	after 2000 raise .topper.little
 }
