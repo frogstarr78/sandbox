@@ -1,4 +1,5 @@
 package require Tk
+package require tktray 1.1
 
 wm title . "Feet to Meters" 
 grid [ttk::frame .c -padding "3 3 12 12"] -column 0 -row 0 -sticky nwes
@@ -21,6 +22,7 @@ focus .c.feet
 bind . <Return> {calculate}
 bind . <Control-q> {exit}
 
+tktray::icon .tracon -image [image create photo imgobj -file "working.gif"]
 
 proc calculate {} {
 	if {[catch {
