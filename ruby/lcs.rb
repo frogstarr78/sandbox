@@ -65,7 +65,7 @@ module TestWithLCS
 
   module Unit
     include SharedMethods
-    def assert_equal_diffs string1, string2
+    def assert_equal_with_lcs string1, string2
       # depending on the size of the strings
       # and since we generate the error message
       # before running the assertion
@@ -81,7 +81,7 @@ module TestWithLCS
 
   module Spec
 
-    class BeFormattedAs
+    class BeEqualWithLCS
       include SharedMethods
       def initialize expected
         @expected = expected
@@ -101,8 +101,8 @@ module TestWithLCS
       end
     end
 
-    def be_formatted_as expected
-      BeFormattedAs.new expected
+    def be_equal_with_lcs expected
+      BeEqualWithLCS.new expected
     end
   end
 end
@@ -116,7 +116,7 @@ class MyTest < Test::Unit::TestCase
     seq2 = %w(b c d e f j k l m r s t) 
     begin
       self.class.colorize = true
-      assert_equal_diffs seq1, seq2
+      assert_equal_with_lcs seq1, seq2
     rescue Test::Unit::AssertionFailedError => received
       expected = '-'.red << ' '.white << ' '.white << '+'.green << ' '.white << '!'.magenta << ' '.white << '+'.green << ' '.white << '-'.red << ' '.white << '!'.magenta << '!'.magenta << '+'.green << "\n" << 
                  ' '.red << 'b'.white << 'c'.white << 'd'.green << 'e'.white << 'f'.magenta << 'j'.white << 'k'.green << 'l'.white << ' '.red << 'm'.white << 'r'.magenta << 's'.magenta << 't'.green << "\n" <<
@@ -138,7 +138,7 @@ efjklmr
 st|
     begin
       self.class.colorize = false
-      assert_equal_diffs seq1, seq2
+      assert_equal_with_lcs seq1, seq2
     rescue Test::Unit::AssertionFailedError => received
       received_messages = received.message.split "\n"
 
@@ -178,7 +178,7 @@ st|
     seq1 = %w(a b c e h j l \  m n p) 
     seq2 = %w(b c d e f j k l m r s t) 
     assert_raises Test::Unit::AssertionFailedError do
-      assert_equal_diffs seq1, seq2
+      assert_equal_with_lcs seq1, seq2
     end
   end
 
@@ -186,7 +186,7 @@ st|
     seq1 = %w(a b c e h j l \  m n p) 
     seq2 = %w(a b c e h j l \  m n p) 
     assert_nothing_raised {
-      assert_equal_diffs seq1, seq2
+      assert_equal_with_lcs seq1, seq2
     }
   end
 
@@ -197,7 +197,7 @@ st|
     seq1 = %q(abcehjl mnp) 
     seq2 = %w(a b c e h j l \  m n p) 
     assert_raises Test::Unit::AssertionFailedError do
-      assert_equal_diffs seq1, seq2
+      assert_equal_with_lcs seq1, seq2
     end
   end
 
@@ -216,48 +216,15 @@ Spec::Runner.configure do |config|
   config.mock_with :mocha
 end
 
-#Spec::Matchers.define :be_formatted_as do |string2|
-#  @string2 = string2
-#  match do |string1|
-#    @string1 = string1
-#    string1 == string2
-#  end
-#  
-#  failure_message_for_should do |string2|
-#    message_array = []
-#    Diff::LCS.sdiff(@string1, @string2) do |diff| 
-#      action = diff.action == '=' ? ' ' : diff.action
-#      case action
-#      when '-'
-#        color  = :red
-#      when '+'
-#        color  = :green
-#      when '!'
-#        color  = :magenta
-#      else
-#        color  = :white
-#      end
-#      left   = diff.new_element || ' '
-#      right  = diff.old_element || ' '
-#      message_array << [left, action, right].map {|thing| thing.send(color) }
-#    end
-#    message_diffs = message_array.transpose
-#
-#    message = message_diffs.map {|diff| diff.join ' ' }.join "\n"
-#  end
-#
-#  alias_method :failure_message_for_should, :failure_message_for_should_not
-#end
-
 describe "Spec" do
   include TestWithLCS::Spec
 
   it "passes" do
-    'actual'.should be_formatted_as('actual')
+    'actual'.should be_equal_with_lcs('actual')
   end
 
   it "doesn't pass" do
-    'actual'.should_not be_formatted_as('something else so this test will fail and we can test the resulting string')
+    'actual'.should_not be_equal_with_lcs('something else so this test will fail and we can test the resulting string')
   end
 
   it "get's correct output" do
@@ -267,7 +234,7 @@ describe "Spec" do
                                   a          c   t           ual           
 something else so this test will fail and we can test the resu lting string"
     lambda{ 
-      'actual'.should be_formatted_as('something else so this test will fail and we can test the resulting string')
+      'actual'.should be_equal_with_lcs('something else so this test will fail and we can test the resulting string')
     }.should raise_error(Spec::Expectations::ExpectationNotMetError, expected_error)
   end
 
@@ -290,7 +257,7 @@ actually I did want it on ...
   ly                
 well a couple lines."
     lambda{ 
-      seq1.should be_formatted_as(seq2)
+      seq1.should be_equal_with_lcs(seq2)
     }.should raise_error(Spec::Expectations::ExpectationNotMetError, expected_error)
   end
 end
