@@ -192,15 +192,11 @@ class Functional < SimpleDelegator
       end 
     end
     has_lambda = find(base_name, *arguments)
-    raise "already defined #{base_name}(#{arguments}) yielding #{has_lambda.call(*arguments)}" if has_lambda
+#    raise "already defined #{base_name}(#{arguments}) yielding #{has_lambda.call(*arguments)}" if has_lambda
     @which.update [base_name, arguments].flatten => block
   end
 
   private 
-    def has?
-     find(base_name, *arguments)
-    end
-
     def find base_name, *arguments
       begin
         @which.fetch [base_name, arguments].flatten
@@ -218,15 +214,68 @@ puts f.fac 0
 puts f.fac 4
 
 
-f = Functional.new
-f.define( :fib, 1 ) { 1 }
-f.define( :fib, 2 ) { 1 }
-f.define( :fib, Fixnum ) {|n| f.fib(n-1) + f.fib(n-2) }
+#f = Functional.new
+#f.define( :fib, 1 ) { 1 }
+#f.define( :fib, 2 ) { 1 }
+#f.define( :fib, Fixnum ) {|n| f.fib(n-1) + f.fib(n-2) }
+#
+#puts f.fib 1
+#puts f.fib 2
+#puts f.fib 3
+#puts f.fib 4
+#puts f.fib 5
+#puts f.fib 6
+#puts f.fib 7
 
-puts f.fib 1
-puts f.fib 2
-puts f.fib 3
-puts f.fib 4
-puts f.fib 5
-puts f.fib 6
-puts f.fib 7
+
+require 'benchmark'
+#Benchmark.bmbm 30 do |bm|
+#  f = Functional.new
+#  bm.report( "define fib 1" ) { f.define( :fib, 1 ) { 1 } }
+#  bm.report( "define fib 2" ) { f.define( :fib, 2 ) { 1 } }
+#  bm.report( "define fib Fixnum" ) { f.define( :fib, Fixnum ) {|n| f.fib(n-1) + f.fib(n-2) } }
+#
+#
+#  bm.report("call f.fib 1") { puts f.fib 1 }
+#  bm.report("call f.fib 2") { puts f.fib 2 }
+#  bm.report("call f.fib 4") { puts f.fib 4 }
+#  bm.report("call f.fib 14") { puts f.fib 14 }
+#  bm.report("call f.fib 1014") { puts f.fib 1014 }
+#end
+
+Benchmark.bmbm 30 do |bm|
+  bm.report( "define fib" ) { 
+    class Fib
+      def self.run n
+        case n
+        when 1, 2
+          1
+        else
+          run(n-1) + run(n-2)
+        end
+      end
+    end
+  }
+
+
+  bm.report("call f.fib 1") { puts Fib.run 1 }
+  bm.report("call f.fib 2") { puts Fib.run 2 }
+  bm.report("call f.fib 4") { puts Fib.run 4 }
+  bm.report("call f.fib 14") { puts Fib.run 14 }
+#  bm.report("call f.fib 1014") { puts Fib.run 1014 }
+end
+
+#puts '-'*10
+#puts Benchmark.bm('measuring') {
+#  f = Functional.new
+#  f.define( :fib, 1 ) { 1 }
+#  f.define( :fib, 2 ) { 1 }
+#  f.define( :fib, Fixnum ) {|n| f.fib(n-1) + f.fib(n-2) }
+#
+#
+#  f.fib 1
+#  f.fib 2
+#  f.fib 4
+#}
+#
+#
