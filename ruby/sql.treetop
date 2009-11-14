@@ -10,10 +10,9 @@
 #  SelectStatement.columns = Column.new.to_a
 #  SelectStatement.table = 
 
-
 grammar Sql
   rule select_stmt
-    ws* "SELECT" ws columns ws "FROM" ws table_def !ws
+    ( ws* "SELECT" ws columns ws "FROM" ws table_def !ws )
   end
 
   rule table_def
@@ -21,7 +20,12 @@ grammar Sql
   end
 
   rule columns
-    '*' / literal+ (space? ',' space? literal)+ / literal
+    ( '*' / literal+ (space? ',' space? literal)+ / literal ) {
+      def dot!
+        write_dot_file 'sql_treetop'
+      end
+    }
+
   end
 
   rule literal
