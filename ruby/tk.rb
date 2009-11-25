@@ -90,14 +90,30 @@ class OtherWorld < Tk::Toplevel
   end
 end
 
-class HelloWorld < Tk::Root
+class HelloWorld < Tk::Toplevel
+  attr_accessor :other
+
   def initialize parent = nil, keys = nil
     super parent, :title => 'Hello World', :width => 500
 
     bar = TkMenu.new(self) 
 
-    file = TkMenu.new(bar) 
-    file.add('command', :label => "Customers",   :command => proc { OtherWorld.new }) 
+    file = TkMenu.new(bar) do
+      tearoff true
+    end
+
+    file.add('command', :label => "Customers",   :command => proc { 
+      if other.nil?
+        self.other = OtherWorld.new
+      else
+        case other.state 
+        when 'withdrawn', 'iconic'
+          other.deiconify
+        else
+          other.withdraw
+        end
+      end
+    }) 
     file.add('command', :label => "Projects",  :command => proc { puts "Close..." }) 
     file.add(:separator) 
     file.add('command', :label => "Quit",   :command => proc { root.destroy }) 
@@ -105,12 +121,14 @@ class HelloWorld < Tk::Root
     sys = TkMenu.new(bar) 
     sys.add('command',  :label => "Quit",     :command => proc { root.destroy }) 
 
-    bar.add('cascade',  :label => "Manage",   :menu => file) 
+    bar.add('cascade',  :label => "Manage", :menu => file) 
     bar.add('cascade',  :label => "System", :menu => sys) 
 
     menu bar
   end
 end
 
+root = Tk::Root.new
+root.withdraw
 h = HelloWorld.new
 Tk.mainloop
