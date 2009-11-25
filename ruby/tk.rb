@@ -3,6 +3,9 @@
 require 'tk'
 include Tk
 
+#$: << "/usr/lib/tktray1.1/" #libtktray1.1.so
+#require 'tktray'
+
 #class Thisn
 #root = Root.new do 
 #	title "Hello world!"
