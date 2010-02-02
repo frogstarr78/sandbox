@@ -1,0 +1,29 @@
+module DTD
+	grammar Element
+	include Base
+	
+		rule element_declaration
+			'<!ELEMENT' space a_name space+ element_options '>'
+		end
+	end
+
+	rule element_options
+		'EMPTY' / 'ANY' / '(#PCDATA)' / '(#CDATA)' / element_children
+	end
+
+  rule element_children
+		'(' space? cardinal_reference ( space? alternate_or_list space? ( cardinal_reference / element_children ) )* space? ')'
+	end
+
+	rule alternate_or_list
+		'|' / ','
+	end
+
+	rule cardinal_reference
+		a_name cardinality?
+	end
+
+	rule cardinality
+		'*' / '+' / '?'
+	end
+end

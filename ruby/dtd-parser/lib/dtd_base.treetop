@@ -1,0 +1,26 @@
+module DTD
+grammar Base
+	rule a_name
+		!xml a_letter ( a_number / a_punctuation / a_letter )*
+	end
+
+	rule xml
+		( 'x' / 'X' ) ('m' / 'M') ('l' / 'L')
+	end
+
+	rule a_number
+		[0-9]
+	end
+
+  rule a_punctuation
+		[!.\-:]
+	end
+
+	rule space
+	  ' '
+	end
+
+	rule a_letter
+		[_a-zA-Z]
+	end
+end
