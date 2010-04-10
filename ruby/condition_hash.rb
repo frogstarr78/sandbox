@@ -1,93 +1,66 @@
 #!/usr/bin/env ruby
 
-#module HashLikeSmalltalkCond
-#  class Object
-#    def nil? hash
-#      hash[:if_true].call
-#      self
-#    end
-#  end
-#
-#  class NilClass
-#    def nil? hash
-#      hash[:if_false].call
-#      self
-#    end
-#  end
-#
-#  class FalseClass
-#    def nil? hash
-#      hash[:if_false].call
-#      self
-#    end
-#  end
-#
-#  bob = nil
-#  bob.nil? :if_true => proc { puts 'true' }, :if_false => proc { puts 'false' }
-#  bob = true
-#  bob.nil? :if_true => proc { puts 'true' }, :if_false => proc { puts 'false' }
-#  bob = false
-#  bob.nil? :if_true => proc { puts 'true' }, :if_false => proc { puts 'false' }
-#end
-
-#module SymbolLikeSmalltalkCond
-#  class Object
-#    def nil? is_true, is_false
-#      is_true.call
-#      self
-#    end
-#  end
-#
-#  class NilClass
-#    def nil? is_true, is_false
-#      is_false.call
-#      self
-#    end
-#  end
-#
-#  class FalseClass
-#    def nil? is_true, is_false
-#      is_false.call
-#      self
-#    end
-#
-#  end
-#
-#  module Kernel
-#      def is_true 
-#        Proc.new { yield }
-#      end
-#
-#      def is_false
-#        Proc.new { yield }
-#      end
-#  end
-#
-#
-#  bob = false
-#  bob.nil? is_true { puts 'y' }, is_false { puts 'n' }
-#end
-
-#module NilModLikeSmalltalkCond
-  class Object
-    def nil?
-      yield :if_true, :if_false
+module HashLikeSmalltalkConditionals
+  class ::Object
+    def nil? hash
+      hash[:if_false].call
+      self
     end
   end
-#end
 
-class Thing
-  attr_accessor :a, :b
+  class ::NilClass
+    def nil? hash
+      hash[:if_true].call
+      self
+    end
+  end
 
-  def q
-    yield a, b
+  def run_example bob
+    bob.nil? :if_true => proc { puts 'true' }, :if_false => proc { puts 'false' }
+    yield bob if block_given?
   end
 end
 
+include HashLikeSmalltalkConditionals
+run_example nil
+run_example false
 
-t = Thing.new
-t.a = 'a'
-t.b = 'b'
-t.q {|a, b|
-  puts "#{a} #{b}"
-}
+module MethodsLikeSmalltalkConditionals
+  module Kernel
+    def is_true 
+      Proc.new { yield }
+    end
+
+    def is_false
+      Proc.new { yield }
+    end
+  end
+
+  class ::Object
+    def nil? is_true, is_false
+      is_false.call
+      self
+    end
+  end
+
+  class ::NilClass
+    def nil? is_true, is_false
+      is_true.call
+      self
+    end
+  end
+
+  include Kernel
+
+  def run_example bob
+    bob.nil? is_true { puts 'nil' }, is_false { puts 'notnil' }
+    yield bob if block_given?
+  end
+end
+
+include MethodsLikeSmalltalkConditionals
+
+run_example nil do |who|
+  who = false
+  who.nil? is_true { puts 'true' }, is_false { puts 'false' }
+end
