@@ -1,0 +1,126 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'pathname'
+require 'audioinfo'
+require 'ap'
+require 'pp'
+
+
+class String
+  def blank?
+    nil? or self == ''
+  end
+end
+
+class Pathname
+  attr_reader :set_attributes
+  private :set_attributes
+
+  def set_from_format format
+    @set_attributes ||= []
+    unformat format
+
+    fname = self.basename.to_s
+    track, title = fname.split(/-/) if fname =~ /-/
+
+    AudioInfo.open(self) do |info|
+      set_attributes.each do |attrib|
+        puts attrib
+        pp send attrib
+#        pp info.send attrib
+      end
+#      info.track = track
+#      info.title = title
+#      pp info # { "artist" => "artist", "title" => "title", etc... }
+    end
+  end
+
+  music_methods = %w(
+    artist
+    genre
+    album
+    tracknum
+    title
+    year
+	).each {|music_attribute| attr_accessor music_attribute }
+
+
+#		Conversion Specifiers
+  def unformat format
+    file_name = self.to_s
+
+    current_part = ''
+#    format.each do |char|
+#      current_part += char
+#      next if current_part == '%'
+#
+#      if current_part =~ /%(.)/
+#        case $1
+#        when 'n'
+#          set_attributes << :tracknum
+#          self.tracknum = file_name.slice! /\d{1,2}/
+#        when 't'
+#          set_attributes << :title
+#          self.title = file_name.slice! /\d{1,2}/
+#        end
+#      else
+#        puts current_part
+#      end
+#    end
+
+    format_array = format.split /([^%]+)?(%.)/
+    format_array.reject!(&:blank?)
+    file_name.slice! format_array.pop   if format_array.last  !~ /^%/
+    puts format_array.inspect
+
+    format_array.each do |part|
+      case part.gsub /%/, ''
+        when '%'; #		%%	A single percent sign
+        when 'a'
+          set_attributes << :artist
+        when 'g'
+          set_attributes << :genre
+        when 'l'
+          set_attributes << :album
+          self.album = file_name.slice! /.+/
+        when 'n'
+          set_attributes << :tracknum
+          self.tracknum = file_name.slice! /\d{1,2}/
+        when 't'
+          set_attributes << :title 
+          self.title = file_name.slice! /.+/
+        when 'y'
+          set_attributes << :year
+        else
+          file_name.slice! part
+      end
+    end
+
+#    format.scan(/%(.)/m) do |c|
+#      case c.first
+#        when '%'; #		%%	A single percent sign
+#        when 'a'
+#          set_attributes << :artist
+#        when 'g'
+#          set_attributes << :genre
+#        when 'l'
+#          set_attributes << :album
+#        when 'n'
+#          set_attributes << :tracknum
+#          self.tracknum = file_name[/(\d{1,2})/]
+#        when 't'
+#          set_attributes << :title 
+#          self.title = file_name[/.+/]
+#        when 'y'
+#          set_attributes << :year
+#        else; ''
+#      end
+#    end
+  end
+end
+
+Pathname.glob(ARGV.last) do |mp3_file|
+#  mp3_file.set_title_and_track_from_filename
+  mp3_file.set_from_format ARGV.first
+end
