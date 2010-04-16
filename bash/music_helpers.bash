@@ -7,12 +7,12 @@ function clean_file () {
 
 function title () {
 	local file_name=$1
-	echo $file_name | cut -d '-' -f 1
+	echo $file_name | cut -d '.' -f 1 | cut -d '-' -f 2 | tr '_' ' '
 }
 
 function track () {
 	local file_name=$1
-	echo $file_name | cut -d '.' -f 1 | cut -d '-' -f 2
+	echo $file_name | cut -d '-' -f 1
 }
 
 function strip_part () {
