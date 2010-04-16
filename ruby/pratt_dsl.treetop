@@ -1,41 +1,43 @@
-grammar PrattDsl
-	rule sentence
-		fragment ( space conjunction space fragment )? '.'
-	end
+module Pratt
+	grammar Dsl
+		rule sentence
+			fragment ( space conjunction space fragment )? '.'
+		end
 
-	rule fragment
-		verb space noun space preposition space literal {
-			def project
-				noun.to_o
-			end
-		}
-	end
+		rule fragment
+			verb space noun space preposition space literal {
+				def project
+					noun.to_o
+				end
+			}
+		end
 
-	rule conjunction
-		'and'
-	end
+		rule conjunction
+			'and'
+		end
 
-	rule literal
-		( ![\ .] . )+
-	end
+		rule literal
+			( ![\ .] . )+
+		end
 
-	rule verb
-		'begin' / 'Begin' / 
-		'start' / 'Start' /
-		'restart' / 'Restart' /
-		'cease' / 'Cease' /
-		'end' / 'End'
-	end
+		rule verb
+			'begin' / 'Begin' / 
+			'start' / 'Start' /
+			'restart' / 'Restart' /
+			'cease' / 'Cease' /
+			'end' / 'End'
+		end
 
-	rule preposition
-		'on' / 'at'
-	end
+		rule preposition
+			'on' / 'at'
+		end
 
-	rule noun
-		( !space . )+ <OrmLookup>
-	end
+		rule noun
+			( !space . )+ <OrmLookup>
+		end
 
-	rule space
-		' '
+		rule space
+			' '
+		end
 	end
 end

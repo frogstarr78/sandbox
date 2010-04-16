@@ -6,10 +6,10 @@ require 'pratt_dsl_orm'
 
 Treetop.load "pratt_dsl"
 
-class PrattDslTest < Test::Unit::TestCase
-  context PrattDslParser do
+class Pratt::DslTest < Test::Unit::TestCase
+  context Pratt::DslParser do
     setup do
-      @parser = PrattDslParser.new
+      @parser = Pratt::DslParser.new
     end
 
     context 'simple sentences beginning with some expected verbs' do

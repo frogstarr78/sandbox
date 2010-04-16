@@ -2,7 +2,7 @@ require 'rubygems'
 require 'dm-core'
 require 'pratt_dsl'
 
-DataMapper.setup :default, "sqlite3:sample.sqlite3"
+DataMapper.setup :default, "sqlite3:pratt_dsl_example.sqlite3"
 
 class Project
   include DataMapper::Resource
@@ -25,7 +25,7 @@ proj = Project.new
 proj.attributes = { :name => 'Research' }
 proj.save
 
-module PrattDsl
+module Pratt::Dsl
   class OrmLookup < Treetop::Runtime::SyntaxNode
 
     def to_o
