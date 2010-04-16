@@ -39,7 +39,7 @@ class PrattDslTest < Test::Unit::TestCase
         should "parse sentence #{sentence}" do
           parsed = @parser.parse(sentence)
           assert parsed
-          puts parsed.fragment.project.inspect
+          assert_kind_of Project, parsed.fragment.project
         end
       end
     end
