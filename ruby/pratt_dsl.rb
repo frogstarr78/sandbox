@@ -10,25 +10,7 @@ module Pratt
    end
 
    module Sentence0
-     def space1
-       elements[0]
-     end
-
-     def conjunction
-       elements[1]
-     end
-
-     def space2
-       elements[2]
-     end
-
-     def fragment
-       elements[3]
-     end
-   end
-
-   module Sentence1
-     def fragment
+     def fragments
        elements[0]
      end
 
@@ -46,57 +28,124 @@ module Pratt
      end
 
      i0, s0 = index, []
-     r1 = _nt_fragment
+     r1 = _nt_fragments
      s0 << r1
      if r1
-       i3, s3 = index, []
-       r4 = _nt_space
-       s3 << r4
-       if r4
-         r5 = _nt_conjunction
-         s3 << r5
-         if r5
-           r6 = _nt_space
-           s3 << r6
-           if r6
-             r7 = _nt_fragment
-             s3 << r7
-           end
-         end
-       end
-       if s3.last
-         r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-         r3.extend(Sentence0)
+       if has_terminal?('.', false, index)
+         r2 = instantiate_node(SyntaxNode,input, index...(index + 1))
+         @index += 1
        else
-         @index = i3
-         r3 = nil
-       end
-       if r3
-         r2 = r3
-       else
-         r2 = instantiate_node(SyntaxNode,input, index...index)
+         terminal_parse_failure('.')
+         r2 = nil
        end
        s0 << r2
-       if r2
-         if has_terminal?('.', false, index)
-           r8 = instantiate_node(SyntaxNode,input, index...(index + 1))
-           @index += 1
-         else
-           terminal_parse_failure('.')
-           r8 = nil
-         end
-         s0 << r8
-       end
      end
      if s0.last
        r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
-       r0.extend(Sentence1)
+       r0.extend(Sentence0)
      else
        @index = i0
        r0 = nil
      end
 
      node_cache[:sentence][start_index] = r0
+
+     r0
+   end
+
+   module Fragments0
+     def space1
+       elements[0]
+     end
+
+     def conjunction
+       elements[1]
+     end
+
+     def space2
+       elements[2]
+     end
+
+     def last
+       elements[3]
+     end
+   end
+
+   module Fragments1
+     def first
+       elements[0]
+     end
+
+     def rest
+       elements[1]
+     end
+   end
+
+   module Fragments2
+
+     def to_a
+       [first] + rest.elements.collect {|e| e.last }
+     end
+   end
+
+   def _nt_fragments
+     start_index = index
+     if node_cache[:fragments].has_key?(index)
+       cached = node_cache[:fragments][index]
+       if cached
+         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+         @index = cached.interval.end
+       end
+       return cached
+     end
+
+     i0, s0 = index, []
+     r1 = _nt_fragment
+     s0 << r1
+     if r1
+       s2, i2 = [], index
+       loop do
+         i3, s3 = index, []
+         r4 = _nt_space
+         s3 << r4
+         if r4
+           r5 = _nt_conjunction
+           s3 << r5
+           if r5
+             r6 = _nt_space
+             s3 << r6
+             if r6
+               r7 = _nt_fragment
+               s3 << r7
+             end
+           end
+         end
+         if s3.last
+           r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
+           r3.extend(Fragments0)
+         else
+           @index = i3
+           r3 = nil
+         end
+         if r3
+           s2 << r3
+         else
+           break
+         end
+       end
+       r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+       s0 << r2
+     end
+     if s0.last
+       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+       r0.extend(Fragments1)
+       r0.extend(Fragments2)
+     else
+       @index = i0
+       r0 = nil
+     end
+
+     node_cache[:fragments][start_index] = r0
 
      r0
    end
@@ -132,12 +181,20 @@ module Pratt
    end
 
    module Fragment1
+     def method
+       verb.to_sym
+     end
+
 				def project
-					noun.to_o
+					noun.find
 				end
 
-     def method
-       verb.text_value.downcase.to_sym
+     def to_s
+       text_value
+     end
+
+     def time
+       temporal_literal.value
      end
    end
 
@@ -304,6 +361,7 @@ module Pratt
      end
      if r1
        r0 = r1
+       r0.extend(OrmMethods)
      else
        if has_terminal?('Begin', false, index)
          r2 = instantiate_node(SyntaxNode,input, index...(index + 5))
@@ -314,6 +372,7 @@ module Pratt
        end
        if r2
          r0 = r2
+         r0.extend(OrmMethods)
        else
          if has_terminal?('start', false, index)
            r3 = instantiate_node(SyntaxNode,input, index...(index + 5))
@@ -324,6 +383,7 @@ module Pratt
          end
          if r3
            r0 = r3
+           r0.extend(OrmMethods)
          else
            if has_terminal?('Start', false, index)
              r4 = instantiate_node(SyntaxNode,input, index...(index + 5))
@@ -334,6 +394,7 @@ module Pratt
            end
            if r4
              r0 = r4
+             r0.extend(OrmMethods)
            else
              if has_terminal?('restart', false, index)
                r5 = instantiate_node(SyntaxNode,input, index...(index + 7))
@@ -344,6 +405,7 @@ module Pratt
              end
              if r5
                r0 = r5
+               r0.extend(OrmMethods)
              else
                if has_terminal?('Restart', false, index)
                  r6 = instantiate_node(SyntaxNode,input, index...(index + 7))
@@ -354,6 +416,7 @@ module Pratt
                end
                if r6
                  r0 = r6
+                 r0.extend(OrmMethods)
                else
                  if has_terminal?('cease', false, index)
                    r7 = instantiate_node(SyntaxNode,input, index...(index + 5))
@@ -364,6 +427,7 @@ module Pratt
                  end
                  if r7
                    r0 = r7
+                   r0.extend(OrmMethods)
                  else
                    if has_terminal?('Cease', false, index)
                      r8 = instantiate_node(SyntaxNode,input, index...(index + 5))
@@ -374,6 +438,7 @@ module Pratt
                    end
                    if r8
                      r0 = r8
+                     r0.extend(OrmMethods)
                    else
                      if has_terminal?('end', false, index)
                        r9 = instantiate_node(SyntaxNode,input, index...(index + 3))
@@ -384,6 +449,7 @@ module Pratt
                      end
                      if r9
                        r0 = r9
+                       r0.extend(OrmMethods)
                      else
                        if has_terminal?('End', false, index)
                          r10 = instantiate_node(SyntaxNode,input, index...(index + 3))
@@ -394,6 +460,7 @@ module Pratt
                        end
                        if r10
                          r0 = r10
+                         r0.extend(OrmMethods)
                        else
                          @index = i0
                          r0 = nil
@@ -508,7 +575,7 @@ module Pratt
        @index = i0
        r0 = nil
      else
-       r0 = instantiate_node(OrmLookup,input, i0...index, s0)
+       r0 = instantiate_node(OrmModel,input, i0...index, s0)
      end
 
      node_cache[:noun][start_index] = r0

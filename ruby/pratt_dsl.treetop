@@ -1,17 +1,33 @@
 module Pratt
 	grammar Dsl
 		rule sentence
-			fragment ( space conjunction space fragment )? '.'
+      fragments '.'
 		end
+
+    rule fragments
+			first:fragment rest:( space conjunction space last:fragment )* { 
+        def to_a
+          [first] + rest.elements.collect {|e| e.last }
+        end
+      }
+    end
 
 		rule fragment
 			verb space noun space preposition space temporal_literal {
+        def method
+          verb.to_sym
+        end
+
 				def project
-					noun.to_o
+					noun.find
 				end
 
-        def method
-          verb.text_value.downcase.to_sym
+        def to_s
+          text_value
+        end
+
+        def time
+          temporal_literal.value
         end
 			}
 		end
@@ -21,15 +37,17 @@ module Pratt
 		end
 
 		rule temporal_literal
-			( ![\ .] . )+
+			( ![\ .] . )+ #<TemporalValue>
 		end
 
 		rule verb
-			'begin' / 'Begin' / 
+			( 
+       'begin' / 'Begin' / 
 			'start' / 'Start' /
 			'restart' / 'Restart' /
 			'cease' / 'Cease' /
 			'end' / 'End'
+      ) <OrmMethods>
 		end
 
 		rule preposition
@@ -37,7 +55,7 @@ module Pratt
 		end
 
 		rule noun
-			( !space . )+ <OrmLookup>
+			( !space . )+ <OrmModel>
 		end
 
 		rule space

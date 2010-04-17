@@ -10,9 +10,10 @@ class Pratt::DslTest < Test::Unit::TestCase
   context Pratt::DslParser do
     setup do
       @parser = Pratt::DslParser.new
+      @plain_sentence = 'Start Lunch/Break at 12:00 and end Lunch/Break at 1:00.'
     end
 
-    context 'simple sentences beginning with some expected verbs' do
+    context 'simple sentences beginning with the expected verbs' do
       sentences = [
         'begin Lunch/Break at 12:00.',
         'Begin Lunch/Break at 12:00.',
@@ -26,8 +27,18 @@ class Pratt::DslTest < Test::Unit::TestCase
         'End Lunch/Break at 12:00.',
       ].each do |sentence|
         should "parse sentence #{sentence}" do
-          assert @parser.parse(sentence)
+          parsed = @parser.parse(sentence)
+          assert parsed
+          assert 1, parsed.fragments.to_a.size
         end
+      end
+    end
+
+    context 'a simple sentence beginning with an unexpected verb' do
+      sentence = 'eat Lunch/Break at 12:00.'
+      should "not parse sentence #{sentence}" do
+        parsed = @parser.parse(sentence)
+        assert !parsed
       end
     end
 
@@ -39,34 +50,57 @@ class Pratt::DslTest < Test::Unit::TestCase
         'Begin Lunch/Break at 12:00 and end Lunch/Break at 1:00.',
       ].each do |sentence|
         should "parse sentence #{sentence}" do
-          assert @parser.parse(sentence)
+          parsed = @parser.parse(sentence)
+          assert parsed
+          assert_respond_to parsed, :fragments
+          assert 2, parsed.fragments.to_a.size
         end
       end
     end
 
-    context "doesn't parse sentences with or in them" do
+    context "doesn't parse sentences with 'or' conjunctions in them" do
         sentence = 'begin Lunch/Break at 12:00 or end Lunch/Break at 1:00.'
         should "not parse #{sentence}" do
-          assert !@parser.parse(sentence)
+          parsed = @parser.parse(sentence)
+          assert !parsed
         end
     end
 
     context "objects" do
       setup do
-        @sentence = 'Start Lunch/Break at 12:00 and end Lunch/Break at 1:00.'
-        @parsed = @parser.parse(@sentence)
+        @parsed = @parser.parse(@plain_sentence)
         assert @parsed
+        @fragment = @parsed.fragments.to_a.first
+      end
+
+      should "return string when calling to_s" do
+        assert_equal 'Start Lunch/Break at 12:00', @fragment.to_s
       end
 
       should "find project based on noun" do
-        assert_kind_of Project, @parsed.fragment.project
+        assert_kind_of Project, @fragment.project
+        assert_equal 2, @parsed.fragments.to_a.size
+        assert_equal 'Start Lunch/Break at 12:00', @parsed.fragments.to_a[0].to_s
+        assert_equal 'end Lunch/Break at 1:00', @parsed.fragments.to_a[1].to_s
       end
 
       should "find method based on verb" do
-        assert_kind_of Symbol, @parsed.fragment.method
-        assert_respond_to @parsed.fragment.project, @parsed.fragment.method
-
+        assert_equal @fragment.verb.text_value.downcase.to_sym, @fragment.method
+        assert_kind_of Symbol, @fragment.method
+        assert_respond_to @fragment.project, @fragment.method
       end
     end
+
+#    context "temporal_value" do
+#      setup do
+#        @parsed = @parser.parse(@plain_sentence)
+#        assert @parsed
+#        @fragment = @parsed.fragments.first
+#      end
+#
+#      should "find the time" do
+#        assert_equal Chronic.parse("12:00"), @fragment.time
+#      end
+#    end
   end
 end
