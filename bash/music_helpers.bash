@@ -4,8 +4,12 @@ function clean_file () {
 	local files=$1
 	for f in $files
 	do
-		file_name=`basename $f`
-		mv $f `echo $file_name | tr ' ' '_' | sed 's/_-_/-/'`
+		file_name=`basename "$f"`
+		new_name=`echo "$file_name" | tr ' ' '_' | sed 's/_-_/-/'`
+		if [[ ! -f "$new_name" ]]
+		then
+			mv "$f" "$new_name"
+		fi
 	done
 }
 
@@ -27,7 +31,11 @@ function strip_part () {
 	for f in $files
 	do
 		file_name=`basename $f`
-		mv $f `echo $file_name | sed "s/$strip_off//"`
+		new_name=`echo $file_name | sed "s/$strip_off//"`
+		if [[ ! -f "$new_name" ]]
+		then
+			mv "$f" "$new_name"
+		fi
 	done
 }
 
@@ -36,7 +44,11 @@ function dasherize_track_and_title () {
 	for f in $files
 	do
 		file_name=`basename $f`
-		mv $f `echo $file_name | sed 's/\(..\)_/\1-/'`
+		new_name=`echo $file_name | sed 's/\(..\)_/\1-/'`
+		if [[ ! -f "$new_name" ]]
+		then
+			mv "$f" "$new_name"
+		fi
 	done
 }
 
@@ -51,10 +63,10 @@ function set_track_and_title () {
 function ogg2mp3 () {
 	for f in *.ogg
 	do
-		fname=`basename $f .ogg`
-		twolame $f $fname.mp2
-		lame $fname.mp2 $fname.mp3
-		rm $fname.ogg
-		rm $fname.mp2
+		file_name=`basename $f .ogg`
+		twolame "$f" "$file_name.mp2"
+		lame "$file_name.mp2" "$file_name.mp3"
+		rm "$file_name.ogg"
+		rm "$file_name.mp2"
 	done
 }
