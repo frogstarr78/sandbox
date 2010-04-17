@@ -5,10 +5,14 @@ module Pratt
 		end
 
 		rule fragment
-			verb space noun space preposition space literal {
+			verb space noun space preposition space temporal_literal {
 				def project
 					noun.to_o
 				end
+
+        def method
+          verb.text_value.downcase.to_sym
+        end
 			}
 		end
 
@@ -16,7 +20,7 @@ module Pratt
 			'and'
 		end
 
-		rule literal
+		rule temporal_literal
 			( ![\ .] . )+
 		end
 

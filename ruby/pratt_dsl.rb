@@ -126,7 +126,7 @@ module Pratt
        elements[5]
      end
 
-     def literal
+     def temporal_literal
        elements[6]
      end
    end
@@ -135,6 +135,10 @@ module Pratt
 				def project
 					noun.to_o
 				end
+
+     def method
+       verb.text_value.downcase.to_sym
+     end
    end
 
    def _nt_fragment
@@ -167,7 +171,7 @@ module Pratt
                r6 = _nt_space
                s0 << r6
                if r6
-                 r7 = _nt_literal
+                 r7 = _nt_temporal_literal
                  s0 << r7
                end
              end
@@ -213,13 +217,13 @@ module Pratt
      r0
    end
 
-   module Literal0
+   module TemporalLiteral0
    end
 
-   def _nt_literal
+   def _nt_temporal_literal
      start_index = index
-     if node_cache[:literal].has_key?(index)
-       cached = node_cache[:literal][index]
+     if node_cache[:temporal_literal].has_key?(index)
+       cached = node_cache[:temporal_literal][index]
        if cached
          cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
          @index = cached.interval.end
@@ -256,7 +260,7 @@ module Pratt
        end
        if s1.last
          r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
-         r1.extend(Literal0)
+         r1.extend(TemporalLiteral0)
        else
          @index = i1
          r1 = nil
@@ -274,7 +278,7 @@ module Pratt
        r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
      end
 
-     node_cache[:literal][start_index] = r0
+     node_cache[:temporal_literal][start_index] = r0
 
      r0
    end
