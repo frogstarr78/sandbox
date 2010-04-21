@@ -14,6 +14,9 @@ module Pratt
        elements[0]
      end
 
+     def period
+       elements[1]
+     end
    end
 
    def _nt_sentence
@@ -31,13 +34,7 @@ module Pratt
      r1 = _nt_fragments
      s0 << r1
      if r1
-       if has_terminal?('.', false, index)
-         r2 = instantiate_node(SyntaxNode,input, index...(index + 1))
-         @index += 1
-       else
-         terminal_parse_failure('.')
-         r2 = nil
-       end
+       r2 = _nt_period
        s0 << r2
      end
      if s0.last
@@ -167,16 +164,8 @@ module Pratt
        elements[3]
      end
 
-     def preposition
-       elements[4]
-     end
-
-     def space3
-       elements[5]
-     end
-
      def temporal_literal
-       elements[6]
+       elements[4]
      end
    end
 
@@ -222,16 +211,8 @@ module Pratt
            r4 = _nt_space
            s0 << r4
            if r4
-             r5 = _nt_preposition
+             r5 = _nt_temporal_literal
              s0 << r5
-             if r5
-               r6 = _nt_space
-               s0 << r6
-               if r6
-                 r7 = _nt_temporal_literal
-                 s0 << r7
-               end
-             end
            end
          end
        end
@@ -246,96 +227,6 @@ module Pratt
      end
 
      node_cache[:fragment][start_index] = r0
-
-     r0
-   end
-
-   def _nt_conjunction
-     start_index = index
-     if node_cache[:conjunction].has_key?(index)
-       cached = node_cache[:conjunction][index]
-       if cached
-         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-         @index = cached.interval.end
-       end
-       return cached
-     end
-
-     if has_terminal?('and', false, index)
-       r0 = instantiate_node(SyntaxNode,input, index...(index + 3))
-       @index += 3
-     else
-       terminal_parse_failure('and')
-       r0 = nil
-     end
-
-     node_cache[:conjunction][start_index] = r0
-
-     r0
-   end
-
-   module TemporalLiteral0
-   end
-
-   def _nt_temporal_literal
-     start_index = index
-     if node_cache[:temporal_literal].has_key?(index)
-       cached = node_cache[:temporal_literal][index]
-       if cached
-         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-         @index = cached.interval.end
-       end
-       return cached
-     end
-
-     s0, i0 = [], index
-     loop do
-       i1, s1 = index, []
-       i2 = index
-       if has_terminal?('\G[\\ .]', true, index)
-         r3 = true
-         @index += 1
-       else
-         r3 = nil
-       end
-       if r3
-         r2 = nil
-       else
-         @index = i2
-         r2 = instantiate_node(SyntaxNode,input, index...index)
-       end
-       s1 << r2
-       if r2
-         if index < input_length
-           r4 = instantiate_node(SyntaxNode,input, index...(index + 1))
-           @index += 1
-         else
-           terminal_parse_failure("any character")
-           r4 = nil
-         end
-         s1 << r4
-       end
-       if s1.last
-         r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
-         r1.extend(TemporalLiteral0)
-       else
-         @index = i1
-         r1 = nil
-       end
-       if r1
-         s0 << r1
-       else
-         break
-       end
-     end
-     if s0.empty?
-       @index = i0
-       r0 = nil
-     else
-       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
-     end
-
-     node_cache[:temporal_literal][start_index] = r0
 
      r0
    end
@@ -480,48 +371,6 @@ module Pratt
      r0
    end
 
-   def _nt_preposition
-     start_index = index
-     if node_cache[:preposition].has_key?(index)
-       cached = node_cache[:preposition][index]
-       if cached
-         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-         @index = cached.interval.end
-       end
-       return cached
-     end
-
-     i0 = index
-     if has_terminal?('on', false, index)
-       r1 = instantiate_node(SyntaxNode,input, index...(index + 2))
-       @index += 2
-     else
-       terminal_parse_failure('on')
-       r1 = nil
-     end
-     if r1
-       r0 = r1
-     else
-       if has_terminal?('at', false, index)
-         r2 = instantiate_node(SyntaxNode,input, index...(index + 2))
-         @index += 2
-       else
-         terminal_parse_failure('at')
-         r2 = nil
-       end
-       if r2
-         r0 = r2
-       else
-         @index = i0
-         r0 = nil
-       end
-     end
-
-     node_cache[:preposition][start_index] = r0
-
-     r0
-   end
-
    module Noun0
    end
 
@@ -583,6 +432,275 @@ module Pratt
      r0
    end
 
+   module TemporalLiteral0
+   end
+
+   module TemporalLiteral1
+     def preposition
+       elements[0]
+     end
+
+     def space
+       elements[1]
+     end
+
+   end
+
+   def _nt_temporal_literal
+     start_index = index
+     if node_cache[:temporal_literal].has_key?(index)
+       cached = node_cache[:temporal_literal][index]
+       if cached
+         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+         @index = cached.interval.end
+       end
+       return cached
+     end
+
+     i0, s0 = index, []
+     r1 = _nt_preposition
+     s0 << r1
+     if r1
+       r2 = _nt_space
+       s0 << r2
+       if r2
+         s3, i3 = [], index
+         loop do
+           i4, s4 = index, []
+           i5 = index
+           i6 = index
+           r7 = _nt_morning_r_evening
+           if r7
+             r6 = r7
+           else
+             r8 = _nt_conjunction
+             if r8
+               r6 = r8
+             else
+               r9 = _nt_period
+               if r9
+                 r6 = r9
+               else
+                 @index = i6
+                 r6 = nil
+               end
+             end
+           end
+           if r6
+             r5 = nil
+           else
+             @index = i5
+             r5 = instantiate_node(SyntaxNode,input, index...index)
+           end
+           s4 << r5
+           if r5
+             if index < input_length
+               r10 = instantiate_node(SyntaxNode,input, index...(index + 1))
+               @index += 1
+             else
+               terminal_parse_failure("any character")
+               r10 = nil
+             end
+             s4 << r10
+           end
+           if s4.last
+             r4 = instantiate_node(SyntaxNode,input, i4...index, s4)
+             r4.extend(TemporalLiteral0)
+           else
+             @index = i4
+             r4 = nil
+           end
+           if r4
+             s3 << r4
+           else
+             break
+           end
+         end
+         if s3.empty?
+           @index = i3
+           r3 = nil
+         else
+           r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
+         end
+         s0 << r3
+       end
+     end
+     if s0.last
+       r0 = instantiate_node(TemporalValue,input, i0...index, s0)
+       r0.extend(TemporalLiteral1)
+     else
+       @index = i0
+       r0 = nil
+     end
+
+     node_cache[:temporal_literal][start_index] = r0
+
+     r0
+   end
+
+   module MorningREvening0
+   end
+
+   def _nt_morning_r_evening
+     start_index = index
+     if node_cache[:morning_r_evening].has_key?(index)
+       cached = node_cache[:morning_r_evening][index]
+       if cached
+         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+         @index = cached.interval.end
+       end
+       return cached
+     end
+
+     i0, s0 = index, []
+     i1 = index
+     if has_terminal?('\G[aA]', true, index)
+       r2 = true
+       @index += 1
+     else
+       r2 = nil
+     end
+     if r2
+       r1 = r2
+     else
+       if has_terminal?('\G[pP]', true, index)
+         r3 = true
+         @index += 1
+       else
+         r3 = nil
+       end
+       if r3
+         r1 = r3
+       else
+         @index = i1
+         r1 = nil
+       end
+     end
+     s0 << r1
+     if r1
+       if has_terminal?('\G[mM]', true, index)
+         r4 = true
+         @index += 1
+       else
+         r4 = nil
+       end
+       s0 << r4
+     end
+     if s0.last
+       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+       r0.extend(MorningREvening0)
+     else
+       @index = i0
+       r0 = nil
+     end
+
+     node_cache[:morning_r_evening][start_index] = r0
+
+     r0
+   end
+
+   def _nt_preposition
+     start_index = index
+     if node_cache[:preposition].has_key?(index)
+       cached = node_cache[:preposition][index]
+       if cached
+         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+         @index = cached.interval.end
+       end
+       return cached
+     end
+
+     i0 = index
+     if has_terminal?('on', false, index)
+       r1 = instantiate_node(SyntaxNode,input, index...(index + 2))
+       @index += 2
+     else
+       terminal_parse_failure('on')
+       r1 = nil
+     end
+     if r1
+       r0 = r1
+     else
+       if has_terminal?('at', false, index)
+         r2 = instantiate_node(SyntaxNode,input, index...(index + 2))
+         @index += 2
+       else
+         terminal_parse_failure('at')
+         r2 = nil
+       end
+       if r2
+         r0 = r2
+       else
+         @index = i0
+         r0 = nil
+       end
+     end
+
+     node_cache[:preposition][start_index] = r0
+
+     r0
+   end
+
+   def _nt_conjunction
+     start_index = index
+     if node_cache[:conjunction].has_key?(index)
+       cached = node_cache[:conjunction][index]
+       if cached
+         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+         @index = cached.interval.end
+       end
+       return cached
+     end
+
+     r0 = _nt_continuation
+
+     node_cache[:conjunction][start_index] = r0
+
+     r0
+   end
+
+   def _nt_continuation
+     start_index = index
+     if node_cache[:continuation].has_key?(index)
+       cached = node_cache[:continuation][index]
+       if cached
+         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+         @index = cached.interval.end
+       end
+       return cached
+     end
+
+     i0 = index
+     if has_terminal?(', ', false, index)
+       r1 = instantiate_node(SyntaxNode,input, index...(index + 2))
+       @index += 2
+     else
+       terminal_parse_failure(', ')
+       r1 = nil
+     end
+     if r1
+       r0 = r1
+     else
+       if has_terminal?('and', false, index)
+         r2 = instantiate_node(SyntaxNode,input, index...(index + 3))
+         @index += 3
+       else
+         terminal_parse_failure('and')
+         r2 = nil
+       end
+       if r2
+         r0 = r2
+       else
+         @index = i0
+         r0 = nil
+       end
+     end
+
+     node_cache[:continuation][start_index] = r0
+
+     r0
+   end
+
    def _nt_space
      start_index = index
      if node_cache[:space].has_key?(index)
@@ -603,6 +721,30 @@ module Pratt
      end
 
      node_cache[:space][start_index] = r0
+
+     r0
+   end
+
+   def _nt_period
+     start_index = index
+     if node_cache[:period].has_key?(index)
+       cached = node_cache[:period][index]
+       if cached
+         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+         @index = cached.interval.end
+       end
+       return cached
+     end
+
+     if has_terminal?('.', false, index)
+       r0 = instantiate_node(SyntaxNode,input, index...(index + 1))
+       @index += 1
+     else
+       terminal_parse_failure('.')
+       r0 = nil
+     end
+
+     node_cache[:period][start_index] = r0
 
      r0
    end

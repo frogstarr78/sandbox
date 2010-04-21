@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'fox16'
 require 'cgi'
 require 'soap/wsdlDriver'

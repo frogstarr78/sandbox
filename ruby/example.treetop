@@ -1,44 +1,39 @@
+#grammar Example
+#  rule labels
+#    first_letter:[a-z] rest_letters:(', ' letter:[a-z])* '.' {
+#      def letters
+#        [first_letter] + rest_letters
+#      end
+#      
+#      def rest_letters 
+#        super.map do |comma_and_letter|
+#          comma_and_letter.letter
+#        end
+#      end
+#    }
+#  end
+#end
+
 grammar Example
-  rule labels
-    first_letter:[a-z] rest_letters:(', ' letter:[a-z])* '.' {
+  rule thing
+    chars '.'
+  end
+
+  rule chars
+    f:char r:(', ' l:char)+ {
       def letters
-        [first_letter] + rest_letters
+        [f] + r.elements.collect {|e| e.l }
       end
-      
-      def rest_letters 
-        super.map do |comma_and_letter|
-          comma_and_letter.letter
-        end
+    }
+    /
+    char {
+      def letters
+        [self]
       end
     }
   end
-end
 
-#grammar Example
-#  rule thing
-#    chars '.'
-#  end
-#
-#  rule chars
-#    char (', ' char)+ {
-#      def letters
-#        self.elements.collect {|e| e.elements.text_value }
-#      end
-#    }
-##    f:char r:(', ' l:char)+ {
-##      def letters
-##        [f.text_value] + r.elements.collect {|e| e.l.text_value }
-##      end
-##    }
-#    /
-#    char {
-#      def letters
-#        [text_value]
-#      end
-#    }
-#  end
-#
-#  rule char
-#    [a-z] 
-#  end
-#end
+  rule char
+    [a-z] 
+  end
+end

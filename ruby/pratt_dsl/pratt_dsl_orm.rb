@@ -64,9 +64,9 @@ module Pratt::Dsl
     end
   end
 
-#  class TemporalValue < Treetop::Runtime::SyntaxNode
-#    def value
-#      Chronic.parse text_value
-#    end
-#  end
+  module TemporalValue #< Treetop::Runtime::SyntaxNode
+    def value
+      Chronic.parse text_value
+    end
+  end
 end

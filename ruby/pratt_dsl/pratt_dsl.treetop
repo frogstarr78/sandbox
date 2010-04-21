@@ -1,7 +1,7 @@
 module Pratt
 	grammar Dsl
 		rule sentence
-      fragments '.'
+      fragments period
 		end
 
     rule fragments
@@ -13,7 +13,7 @@ module Pratt
     end
 
 		rule fragment
-			verb space noun space preposition space temporal_literal {
+			verb space noun space temporal_literal {
         def method
           verb.to_sym
         end
@@ -32,14 +32,6 @@ module Pratt
 			}
 		end
 
-		rule conjunction
-			'and'
-		end
-
-		rule temporal_literal
-			( ![\ .] . )+ #<TemporalValue>
-		end
-
 		rule verb
 			( 
        'begin' / 'Begin' / 
@@ -50,16 +42,36 @@ module Pratt
       ) <OrmMethods>
 		end
 
+		rule noun
+			( !space . )+ <OrmModel>
+		end
+
+		rule temporal_literal
+      preposition space ( !( morning_r_evening / conjunction / period ) . )+ <TemporalValue>
+		end
+
+    rule morning_r_evening
+      ( [aA] / [pP] ) [mM]
+    end
+
 		rule preposition
 			'on' / 'at'
 		end
 
-		rule noun
-			( !space . )+ <OrmModel>
+    rule conjunction
+      continuation
+    end
+
+		rule continuation
+			', ' / 'and'
 		end
 
 		rule space
 			' '
 		end
+
+    rule period
+      '.'
+    end
 	end
 end

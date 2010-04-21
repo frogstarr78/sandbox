@@ -1,0 +1,9 @@
+require 'rake/testtask'
+Rake::TestTask.new(:test) do |test|
+  test.libs << 'lib' << 'test'
+  test.libs.compact!
+  test.libs.uniq!
+  test.pattern = 'test_*.rb'
+  test.verbose = true
+  test.options ||= '--runner=tk'
+end

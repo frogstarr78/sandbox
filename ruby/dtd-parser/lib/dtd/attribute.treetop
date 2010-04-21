@@ -1,0 +1,22 @@
+module DTD
+	grammar Attribute
+	include Base
+
+		rule attribute_list_declaration
+			'<!ATTLIST' space a_name space 'id ID #REQUIRED' space? '>'
+	#		'<!ATTLIST' space a_name space+ a_name attribute_type attribute_options '>'
+		end
+
+		rule attribute_type
+			'CDATA' / 'ID' / 'IDREF' / 'IDREFS' / 'NMTOKEN' / 'NMTOKENS' / 'ENTITY' / 'ENTITIES'
+		end
+
+		rule attribute_options
+			'#' ( 'IMPLIED' / 'REQUIRED' / 'FIXED' '"' default '"' ) / '"' default '"'
+		end
+
+		rule default
+			.+
+		end
+	end
+end

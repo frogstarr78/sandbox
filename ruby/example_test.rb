@@ -14,13 +14,13 @@ class ExampleTest < Test::Unit::TestCase
     should "parse a character" do
       parsed = @parser.parse 'a.'
       assert parsed
-      puts parsed.inspect
+#      puts parsed.inspect
 #      puts parsed.labels.inspect
 #      puts parsed.letters.inspect
 #      puts parsed.chars.inspect
 #      puts parsed.inspect
-      assert_equal %w(a), parsed.letters
-#      assert_kind_of Treetop::Runtime::SyntaxNode, parsed.chars
+      assert_equal %w(a), parsed.chars.letters.collect(&:text_value)
+      assert_kind_of Treetop::Runtime::SyntaxNode, parsed.chars
     end
 
     should "parse comma seperated list" do
@@ -30,8 +30,8 @@ class ExampleTest < Test::Unit::TestCase
 #      puts parsed.letters.inspect
 #      puts parsed.chars.inspect
 #      puts parsed.inspect
-#      assert_equal %w(a b c), parsed.letters
-#      assert_kind_of Treetop::Runtime::SyntaxNode, parsed.chars
+      assert_equal %w(a b c), parsed.chars.letters.collect(&:text_value)
+      assert_kind_of Treetop::Runtime::SyntaxNode, parsed.chars
     end
   end
 end
