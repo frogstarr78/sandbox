@@ -2,9 +2,9 @@ module Pratt
 	grammar Dsl
 
 		rule sentence
-      fragment more_fragments:(conjunction fragment)* period {
+      fragment conjoined_fragments:(conjunction fragment)* period {
         def fragments
-          [fragment] + more_fragments.elements.map {|frag| frag.fragment }
+          [fragment] + conjoined_fragments.elements.collect {|frag| frag.fragment }
         end
       }
     end
@@ -36,7 +36,7 @@ module Pratt
 		end
 
     rule literal
-      ( ( !conjunction !period . )+ / ( !period !conjunction . )+ )
+      ( ( !meaningless_conjunction !conjunction !period . )+ / ( !conjunction !period . )+ / ( !period !conjunction . )+ )
     end
 
     rule morning_r_evening
@@ -52,8 +52,16 @@ module Pratt
     end
 
 		rule continuation
-			( comma? space 'and' / comma ) space 
+			( space 'and' / comma space 'and' / comma ) space
 		end
+
+    rule and
+      'and' space
+    end
+
+    rule meaningless_conjunction
+      'or'
+    end
 
 		rule space
 			' '

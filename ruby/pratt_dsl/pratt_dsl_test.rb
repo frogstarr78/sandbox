@@ -57,41 +57,6 @@ class Pratt::DslTest < Test::Unit::TestCase
       end
     end
 
-    context "parses fragments into their sub-parts" do
-      setup do
-        @sentence = 'begin Lunch/Break at 12:00.'
-        @parsed = @parser.parse @sentence
-        @fragments = @parsed.fragments.to_a
-        @fragment = @fragments.first
-      end
-
-      should "have a fragment" #do
-#        assert_equal 1, @fragments.size
-#        assert_kind_of Treetop::Runtime::SyntaxNode, @fragment
-#      end
-
-      should "produce a method based on the verb" # do
-#        puts @fragment.inspect
-#        assert_equal :begin, @fragment.verb
-#        assert_respond_to @fragment.project, @fragment.method
-#      end
-
-      should "produce an orm object" # do
-#      end
-
-      should "produce a temporal argument to the method" # do
-#      end
-    end
-
-#    # TODO: Make or conjunction usless or find a use for it
-##    context "doesn't parse sentences with 'or' conjunctions in them" do
-##        sentence = 'begin Lunch/Break at 12:00 or end Lunch/Break at 1:00.'
-##        should "not parse #{sentence}" do
-##          parsed = @parser.parse(sentence)
-##          assert !parsed
-##        end
-##    end
-
 #    context "objects" do
 ##      setup do
 ##        @plain_sentence = 'Start Lunch/Break at 12:00 pm and end Lunch/Break at 1:00.'

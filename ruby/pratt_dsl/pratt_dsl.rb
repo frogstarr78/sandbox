@@ -24,7 +24,7 @@ module Pratt
        elements[0]
      end
 
-     def more_fragments
+     def conjoined_fragments
        elements[1]
      end
 
@@ -35,7 +35,7 @@ module Pratt
 
    module Sentence2
      def fragments
-       [fragment] + more_fragments.elements.map {|frag| frag.fragment }
+       [fragment] + conjoined_fragments.elements.collect {|frag| frag.fragment }
      end
    end
 
@@ -425,6 +425,9 @@ module Pratt
    module Literal1
    end
 
+   module Literal2
+   end
+
    def _nt_literal
      start_index = index
      if node_cache[:literal].has_key?(index)
@@ -441,7 +444,7 @@ module Pratt
      loop do
        i2, s2 = index, []
        i3 = index
-       r4 = _nt_conjunction
+       r4 = _nt_meaningless_conjunction
        if r4
          r3 = nil
        else
@@ -451,7 +454,7 @@ module Pratt
        s2 << r3
        if r3
          i5 = index
-         r6 = _nt_period
+         r6 = _nt_conjunction
          if r6
            r5 = nil
          else
@@ -460,14 +463,25 @@ module Pratt
          end
          s2 << r5
          if r5
-           if index < input_length
-             r7 = instantiate_node(SyntaxNode,input, index...(index + 1))
-             @index += 1
-           else
-             terminal_parse_failure("any character")
+           i7 = index
+           r8 = _nt_period
+           if r8
              r7 = nil
+           else
+             @index = i7
+             r7 = instantiate_node(SyntaxNode,input, index...index)
            end
            s2 << r7
+           if r7
+             if index < input_length
+               r9 = instantiate_node(SyntaxNode,input, index...(index + 1))
+               @index += 1
+             else
+               terminal_parse_failure("any character")
+               r9 = nil
+             end
+             s2 << r9
+           end
          end
        end
        if s2.last
@@ -492,63 +506,119 @@ module Pratt
      if r1
        r0 = r1
      else
-       s8, i8 = [], index
+       s10, i10 = [], index
        loop do
-         i9, s9 = index, []
-         i10 = index
-         r11 = _nt_period
-         if r11
-           r10 = nil
+         i11, s11 = index, []
+         i12 = index
+         r13 = _nt_conjunction
+         if r13
+           r12 = nil
          else
-           @index = i10
-           r10 = instantiate_node(SyntaxNode,input, index...index)
+           @index = i12
+           r12 = instantiate_node(SyntaxNode,input, index...index)
          end
-         s9 << r10
-         if r10
-           i12 = index
-           r13 = _nt_conjunction
-           if r13
-             r12 = nil
+         s11 << r12
+         if r12
+           i14 = index
+           r15 = _nt_period
+           if r15
+             r14 = nil
            else
-             @index = i12
-             r12 = instantiate_node(SyntaxNode,input, index...index)
+             @index = i14
+             r14 = instantiate_node(SyntaxNode,input, index...index)
            end
-           s9 << r12
-           if r12
+           s11 << r14
+           if r14
              if index < input_length
-               r14 = instantiate_node(SyntaxNode,input, index...(index + 1))
+               r16 = instantiate_node(SyntaxNode,input, index...(index + 1))
                @index += 1
              else
                terminal_parse_failure("any character")
-               r14 = nil
+               r16 = nil
              end
-             s9 << r14
+             s11 << r16
            end
          end
-         if s9.last
-           r9 = instantiate_node(SyntaxNode,input, i9...index, s9)
-           r9.extend(Literal1)
+         if s11.last
+           r11 = instantiate_node(SyntaxNode,input, i11...index, s11)
+           r11.extend(Literal1)
          else
-           @index = i9
-           r9 = nil
+           @index = i11
+           r11 = nil
          end
-         if r9
-           s8 << r9
+         if r11
+           s10 << r11
          else
            break
          end
        end
-       if s8.empty?
-         @index = i8
-         r8 = nil
+       if s10.empty?
+         @index = i10
+         r10 = nil
        else
-         r8 = instantiate_node(SyntaxNode,input, i8...index, s8)
+         r10 = instantiate_node(SyntaxNode,input, i10...index, s10)
        end
-       if r8
-         r0 = r8
+       if r10
+         r0 = r10
        else
-         @index = i0
-         r0 = nil
+         s17, i17 = [], index
+         loop do
+           i18, s18 = index, []
+           i19 = index
+           r20 = _nt_period
+           if r20
+             r19 = nil
+           else
+             @index = i19
+             r19 = instantiate_node(SyntaxNode,input, index...index)
+           end
+           s18 << r19
+           if r19
+             i21 = index
+             r22 = _nt_conjunction
+             if r22
+               r21 = nil
+             else
+               @index = i21
+               r21 = instantiate_node(SyntaxNode,input, index...index)
+             end
+             s18 << r21
+             if r21
+               if index < input_length
+                 r23 = instantiate_node(SyntaxNode,input, index...(index + 1))
+                 @index += 1
+               else
+                 terminal_parse_failure("any character")
+                 r23 = nil
+               end
+               s18 << r23
+             end
+           end
+           if s18.last
+             r18 = instantiate_node(SyntaxNode,input, i18...index, s18)
+             r18.extend(Literal2)
+           else
+             @index = i18
+             r18 = nil
+           end
+           if r18
+             s17 << r18
+           else
+             break
+           end
+         end
+         if s17.empty?
+           @index = i17
+           r17 = nil
+         else
+           r17 = instantiate_node(SyntaxNode,input, i17...index, s17)
+         end
+         if r17
+           r0 = r17
+         else
+           @index = i0
+           r0 = nil
+         end
        end
      end
 
@@ -680,12 +750,23 @@ module Pratt
 
    module Continuation0
      def space
-       elements[1]
+       elements[0]
      end
 
    end
 
    module Continuation1
+     def comma
+       elements[0]
+     end
+
+     def space
+       elements[1]
+     end
+
+   end
+
+   module Continuation2
      def space
        elements[1]
      end
@@ -705,26 +786,17 @@ module Pratt
      i0, s0 = index, []
      i1 = index
      i2, s2 = index, []
-     r4 = _nt_comma
-     if r4
-       r3 = r4
-     else
-       r3 = instantiate_node(SyntaxNode,input, index...index)
-     end
+     r3 = _nt_space
      s2 << r3
      if r3
-       r5 = _nt_space
-       s2 << r5
-       if r5
-         if has_terminal?('and', false, index)
-           r6 = instantiate_node(SyntaxNode,input, index...(index + 3))
-           @index += 3
-         else
-           terminal_parse_failure('and')
-           r6 = nil
-         end
-         s2 << r6
+       if has_terminal?('and', false, index)
+         r4 = instantiate_node(SyntaxNode,input, index...(index + 3))
+         @index += 3
+       else
+         terminal_parse_failure('and')
+         r4 = nil
        end
+       s2 << r4
      end
      if s2.last
        r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
@@ -736,28 +808,123 @@ module Pratt
      if r2
        r1 = r2
      else
-       r7 = _nt_comma
-       if r7
-         r1 = r7
+       i5, s5 = index, []
+       r6 = _nt_comma
+       s5 << r6
+       if r6
+         r7 = _nt_space
+         s5 << r7
+         if r7
+           if has_terminal?('and', false, index)
+             r8 = instantiate_node(SyntaxNode,input, index...(index + 3))
+             @index += 3
+           else
+             terminal_parse_failure('and')
+             r8 = nil
+           end
+           s5 << r8
+         end
+       end
+       if s5.last
+         r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+         r5.extend(Continuation1)
        else
-         @index = i1
-         r1 = nil
+         @index = i5
+         r5 = nil
+       end
+       if r5
+         r1 = r5
+       else
+         r9 = _nt_comma
+         if r9
+           r1 = r9
+         else
+           @index = i1
+           r1 = nil
+         end
        end
      end
      s0 << r1
      if r1
-       r8 = _nt_space
-       s0 << r8
+       r10 = _nt_space
+       s0 << r10
      end
      if s0.last
        r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
-       r0.extend(Continuation1)
+       r0.extend(Continuation2)
      else
        @index = i0
        r0 = nil
      end
 
      node_cache[:continuation][start_index] = r0
+
+     r0
+   end
+
+   module And0
+     def space
+       elements[1]
+     end
+   end
+
+   def _nt_and
+     start_index = index
+     if node_cache[:and].has_key?(index)
+       cached = node_cache[:and][index]
+       if cached
+         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+         @index = cached.interval.end
+       end
+       return cached
+     end
+
+     i0, s0 = index, []
+     if has_terminal?('and', false, index)
+       r1 = instantiate_node(SyntaxNode,input, index...(index + 3))
+       @index += 3
+     else
+       terminal_parse_failure('and')
+       r1 = nil
+     end
+     s0 << r1
+     if r1
+       r2 = _nt_space
+       s0 << r2
+     end
+     if s0.last
+       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
+       r0.extend(And0)
+     else
+       @index = i0
+       r0 = nil
+     end
+
+     node_cache[:and][start_index] = r0
+
+     r0
+   end
+
+   def _nt_meaningless_conjunction
+     start_index = index
+     if node_cache[:meaningless_conjunction].has_key?(index)
+       cached = node_cache[:meaningless_conjunction][index]
+       if cached
+         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+         @index = cached.interval.end
+       end
+       return cached
+     end
+
+     if has_terminal?('or', false, index)
+       r0 = instantiate_node(SyntaxNode,input, index...(index + 2))
+       @index += 2
+     else
+       terminal_parse_failure('or')
+       r0 = nil
+     end
+
+     node_cache[:meaningless_conjunction][start_index] = r0
 
      r0
    end
