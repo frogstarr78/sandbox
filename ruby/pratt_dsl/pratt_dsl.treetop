@@ -1,35 +1,31 @@
 module Pratt
 	grammar Dsl
-		rule sentence
-      fragments period
-		end
 
-    rule fragments
-			first:fragment rest:( space conjunction space last:fragment )* { 
-        def to_a
-          [first] + rest.elements.collect {|e| e.last }
+		rule sentence
+      fragment more_fragments:(conjunction fragment)* period {
+        def fragments
+          [fragment] + more_fragments.elements.map {|frag| frag.fragment }
         end
       }
     end
 
 		rule fragment
-			verb space noun space temporal_literal {
-        def method
-          verb.to_sym
-        end
-
-				def project
-					noun.find
-				end
-
+      ( ( !conjunction !period . )+ / ( !period !conjunction . )+ ) {
         def to_s
           text_value
         end
+      }
 
-        def time
-          temporal_literal.value
-        end
-			}
+#			verb space noun space temporal_literal {
+#        def method #          verb.to_sym #        end #
+#				def project
+#					noun.find
+#				end
+#
+#        def time
+#          temporal_literal.value
+#        end
+#			}
 		end
 
 		rule verb
@@ -47,7 +43,7 @@ module Pratt
 		end
 
 		rule temporal_literal
-      preposition space ( !( morning_r_evening / conjunction / period ) . )+ <TemporalValue>
+      preposition space .+ <TemporalValue>
 		end
 
     rule morning_r_evening
@@ -58,17 +54,22 @@ module Pratt
 			'on' / 'at'
 		end
 
-    rule conjunction
-      continuation
-    end
+#    rule conjunction
+#      continuation
+#    end
 
-		rule continuation
-			', ' / 'and'
+    rule conjunction
+#		rule continuation
+			( comma? space 'and' / comma ) space
 		end
 
 		rule space
 			' '
 		end
+
+    rule comma
+      ','
+    end
 
     rule period
       '.'
