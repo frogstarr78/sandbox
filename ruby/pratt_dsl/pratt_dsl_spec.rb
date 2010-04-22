@@ -30,8 +30,12 @@ describe Pratt::DslSpec do
     good_verbs.each do |verb|
       it "parse sentence with expected verb '#{verb}'" do
         parsed = @parser.parse(phrase(verb))
-        parsed.should_not be(nil)
-        parsed.fragments.first.to_s.should eql(phrase(verb).chomp("."))
+        parsed.should_not be_nil
+        interesting_fragment = parsed.fragments.first
+        interesting_fragment.to_s.should eql(phrase(verb).chomp("."))
+        interesting_fragment.verb.to_s.should eql(verb.downcase)
+        interesting_fragment.noun.to_s.should eql('Lunch/Break')
+        interesting_fragment.temporal.value.should eql(Chronic.parse('12:00'))
       end
     end
 

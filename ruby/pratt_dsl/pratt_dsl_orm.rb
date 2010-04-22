@@ -54,11 +54,19 @@ proj.save
 module Pratt::Dsl
   module OrmMethods
     def to_sym
-      text_value.downcase.to_sym
+      to_s.to_sym
+    end
+
+    def to_s
+      text_value.downcase
     end
   end
 
   class OrmModel < Treetop::Runtime::SyntaxNode
+    def to_s
+      text_value
+    end
+
     def find
       Project.named text_value
     end
@@ -66,7 +74,7 @@ module Pratt::Dsl
 
   module TemporalValue #< Treetop::Runtime::SyntaxNode
     def value
-      Chronic.parse text_value
+      Chronic.parse literal.text_value
     end
   end
 end

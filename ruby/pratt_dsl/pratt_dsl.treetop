@@ -10,22 +10,11 @@ module Pratt
     end
 
 		rule fragment
-      ( ( !conjunction !period . )+ / ( !period !conjunction . )+ ) {
+      verb space noun space temporal {
         def to_s
           text_value
         end
       }
-
-#			verb space noun space temporal_literal {
-#        def method #          verb.to_sym #        end #
-#				def project
-#					noun.find
-#				end
-#
-#        def time
-#          temporal_literal.value
-#        end
-#			}
 		end
 
 		rule verb
@@ -42,9 +31,13 @@ module Pratt
 			( !space . )+ <OrmModel>
 		end
 
-		rule temporal_literal
-      preposition space .+ <TemporalValue>
+		rule temporal
+      preposition space literal <TemporalValue>
 		end
+
+    rule literal
+      ( ( !conjunction !period . )+ / ( !period !conjunction . )+ )
+    end
 
     rule morning_r_evening
       ( [aA] / [pP] ) [mM]
@@ -54,13 +47,12 @@ module Pratt
 			'on' / 'at'
 		end
 
-#    rule conjunction
-#      continuation
-#    end
-
     rule conjunction
-#		rule continuation
-			( comma? space 'and' / comma ) space
+      continuation 
+    end
+
+		rule continuation
+			( comma? space 'and' / comma ) space 
 		end
 
 		rule space
