@@ -36,7 +36,7 @@ module Pratt
 		end
 
     rule literal
-      ( ( !meaningless_conjunction !conjunction !period . )+ / ( !conjunction !period . )+ / ( !period !conjunction . )+ )
+      ( ( !meaningless_conjunction !conjunction !period . )+ / ( !meaningless_conjunction !period . )+ )
     end
 
     rule morning_r_evening
@@ -54,10 +54,6 @@ module Pratt
 		rule continuation
 			( space 'and' / comma space 'and' / comma ) space
 		end
-
-    rule and
-      'and' space
-    end
 
     rule meaningless_conjunction
       'or'

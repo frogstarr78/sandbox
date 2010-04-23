@@ -425,9 +425,6 @@ module Pratt
    module Literal1
    end
 
-   module Literal2
-   end
-
    def _nt_literal
      start_index = index
      if node_cache[:literal].has_key?(index)
@@ -510,7 +507,7 @@ module Pratt
        loop do
          i11, s11 = index, []
          i12 = index
-         r13 = _nt_conjunction
+         r13 = _nt_meaningless_conjunction
          if r13
            r12 = nil
          else
@@ -561,64 +558,8 @@ module Pratt
        if r10
          r0 = r10
        else
-         s17, i17 = [], index
-         loop do
-           i18, s18 = index, []
-           i19 = index
-           r20 = _nt_period
-           if r20
-             r19 = nil
-           else
-             @index = i19
-             r19 = instantiate_node(SyntaxNode,input, index...index)
-           end
-           s18 << r19
-           if r19
-             i21 = index
-             r22 = _nt_conjunction
-             if r22
-               r21 = nil
-             else
-               @index = i21
-               r21 = instantiate_node(SyntaxNode,input, index...index)
-             end
-             s18 << r21
-             if r21
-               if index < input_length
-                 r23 = instantiate_node(SyntaxNode,input, index...(index + 1))
-                 @index += 1
-               else
-                 terminal_parse_failure("any character")
-                 r23 = nil
-               end
-               s18 << r23
-             end
-           end
-           if s18.last
-             r18 = instantiate_node(SyntaxNode,input, i18...index, s18)
-             r18.extend(Literal2)
-           else
-             @index = i18
-             r18 = nil
-           end
-           if r18
-             s17 << r18
-           else
-             break
-           end
-         end
-         if s17.empty?
-           @index = i17
-           r17 = nil
-         else
-           r17 = instantiate_node(SyntaxNode,input, i17...index, s17)
-         end
-         if r17
-           r0 = r17
-         else
-           @index = i0
-           r0 = nil
-         end
+         @index = i0
+         r0 = nil
        end
      end
 
@@ -858,49 +799,6 @@ module Pratt
      end
 
      node_cache[:continuation][start_index] = r0
-
-     r0
-   end
-
-   module And0
-     def space
-       elements[1]
-     end
-   end
-
-   def _nt_and
-     start_index = index
-     if node_cache[:and].has_key?(index)
-       cached = node_cache[:and][index]
-       if cached
-         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-         @index = cached.interval.end
-       end
-       return cached
-     end
-
-     i0, s0 = index, []
-     if has_terminal?('and', false, index)
-       r1 = instantiate_node(SyntaxNode,input, index...(index + 3))
-       @index += 3
-     else
-       terminal_parse_failure('and')
-       r1 = nil
-     end
-     s0 << r1
-     if r1
-       r2 = _nt_space
-       s0 << r2
-     end
-     if s0.last
-       r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
-       r0.extend(And0)
-     else
-       @index = i0
-       r0 = nil
-     end
-
-     node_cache[:and][start_index] = r0
 
      r0
    end
