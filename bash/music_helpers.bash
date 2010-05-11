@@ -1,14 +1,18 @@
 #!/bin/bash
 
+function clean_spaces () {
+	echo "$1" | tr ' ' '_' | sed 's/_-_/-/'
+}
+
 function clean_file () {
 	local files=$1
 	for f in $files
 	do
 		file_name=`basename "$f"`
-		new_name=`echo "$file_name" | tr ' ' '_' | sed 's/_-_/-/'`
+		new_name=`clean_spaces "$file_name"`
 		if [[ ! -f "$new_name" ]]
 		then
-			mv "$f" "$new_name"
+			echo mv "$f" "$new_name"
 		fi
 	done
 }
@@ -69,4 +73,36 @@ function ogg2mp3 () {
 		rm "$file_name.ogg"
 		rm "$file_name.mp2"
 	done
+}
+
+function organize_by_metadata () {
+	oifs=$IFS
+	IFS=''
+	local files="$1"
+
+	for fil in $files
+	do
+		extension=`echo "$fil" | cut -d '.' -f 2`		
+		album=` mp3info -p "%l" "$fil"`
+		album=`clean_spaces $album`
+
+		artist=`mp3info -p "%a" "$fil"`
+		artist=`clean_spaces $artist`
+
+		artist_initial=`echo $artist | sed 's/^\(.\).*/\1/'`
+
+		track=` mp3info -p "%n" "$fil"`
+		track=` clean_spaces $track`
+
+		title=` mp3info -p "%t" "$fil"`
+		title=` clean_spaces $title`
+
+		bdir="$extension/$artist_initial/$artist/$album/"
+		if [[ ! -d $bdir ]]
+		then
+			mkdir -p $bdir
+		fi
+		mv "$fil" "$bdir/$track-$title.$extension"
+	done
+	IFS=$oifs
 }
