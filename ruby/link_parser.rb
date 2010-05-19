@@ -17,3 +17,9 @@ puts "verb '#{sent.verb}'"   # => "is.v"
 puts "subject '#{sent.subject}'" # => 
 puts "object '#{sent.object}'"  # => 
 puts sent.constituent_tree_string 
+
+sent = dict.parse "Start the project Lunch/Break at 12:00."
+puts "verb '#{sent.verb}'"   # => "is.v" 
+puts "subject '#{sent.subject}'" # => 
+puts "object '#{sent.object}'"  # => 
+puts sent.constituent_tree_string 
