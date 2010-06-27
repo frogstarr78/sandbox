@@ -21,15 +21,10 @@ toffoli(1, 1, 0) -> [1, 1, 1];
 toffoli(1, 1, 1) -> [1, 1, 0];
 toffoli(X, Y, 0) -> [X, Y, 0];
 toffoli(X, Y, 1) -> [X, Y, 1];
-toffoli(X, Y, Z) ->
-	[X, Y, Z].
+toffoli(X, Y, Z) -> [X, Y, Z].
 
-toffoli2(X, Y, 0) ->
-	[X, Y, qand(X, Y)];
-toffoli2(X, 1, 0) -> 
-	[First, Next] = fanout(X),
-	[First, 1, Next];
-toffoli2(1, 1, Z) ->
-	[1, 1, qnot(Z)];
-toffoli2(X, Y, Z) ->
-	[X, Y, Z].
+toffoli2(X, Y, 0) -> [X, Y, qand(X, Y)];
+toffoli2(X, 1, 0) -> [First, Next] = fanout(X),
+                     [First, 1, Next];
+toffoli2(1, 1, Z) -> [1, 1, qnot(Z)];
+toffoli2(X, Y, Z) -> [X, Y, Z].
