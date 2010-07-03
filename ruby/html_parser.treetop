@@ -1,0 +1,21 @@
+grammar HTML
+  rule any 
+    .
+  end
+
+  rule space
+    "\n" / "\t" / "\s"
+  end
+
+  rule equal
+    '='
+  end
+
+  rule double_quote
+    '"'
+  end
+
+  rule single_quote
+    "'"
+  end
+end

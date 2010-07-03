@@ -1,43 +1,34 @@
+require 'html_parser'
+
 grammar HTMLAttribute
+  include HTML
+
   rule attributes
     attribute space_n_attributes:( space attribute )* {
-      def attributes
+      def to_a
         [attribute] + space_n_attributes.elements.collect{|space_n_attribute| space_n_attribute.attribute }
+      end
 
-#        result = AttributeNodeMap.new attribute.attribute_name, attribute.attribute_value
-#        space_n_attributes.elements.collect do |space_n_attribute|
-#          result << [space_n_attribute.attribute.attribute_name, space_n_attribute.attribute.attribute_value]
-#        end
+      def to_hash
+        hash = { attribute.attribute_name.to_s => attribute, }
+        space_n_attributes.elements.each{|space_n_attribute| 
+          hash.update space_n_attribute.attribute.attribute_name.to_s => space_n_attribute.attribute
+        }
+        hash
+      end
 
-#        class << result
-#          def to_a
-#            self
-#          end
-#
-#          def to_hash
-#            result = {
-#              self.attribute_name => self.attribute_value
-#            }
-#            space_n_attributes.elements.each{|space_n_attribute| 
-#              result.update space_n_attribute.attribute_name => space_n_attribute.attribute_value
-#            }
-#          end
-#        end
-#
-#        result = {
-#          attribute.attribute_name => attribute.attribute_value
-#        }
-#        space_n_attributes.elements.each{|space_n_attribute| 
-##          attribute = space_n_attribute.attribute
-#          result.update space_n_attribute.attribute_name => space_n_attribute.attribute_value
-#        }
-#        result
+      def has_key? key
+        self.to_hash.has_key? key
       end
     }
   end
 
   rule attribute
-    attribute_name equals attribute_value
+    attribute_name equal attribute_value {
+      def to_s
+        text_value
+      end
+    }
   end
 
   rule attribute_name
@@ -55,25 +46,5 @@ grammar HTMLAttribute
         val.text_value
       end
     }
-  end
-
-  rule equals
-    '='
-  end
-
-  rule double_quote
-    '"'
-  end
-
-  rule single_quote
-    "'"
-  end
-
-  rule any
-    .
-  end
-
-  rule space
-    "\n" / "\t" / "\s"
   end
 end
