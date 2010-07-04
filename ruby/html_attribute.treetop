@@ -6,15 +6,27 @@ grammar HTMLAttribute
   rule attributes
     attribute space_n_attributes:( space attribute )* {
       def to_a
-        [attribute] + space_n_attributes.elements.collect{|space_n_attribute| space_n_attribute.attribute }
+        @attirbute_array ||= [attribute] + space_n_attributes.elements.collect{|space_n_attribute| space_n_attribute.attribute }
       end
 
       def to_hash
-        hash = { attribute.attribute_name.to_s => attribute, }
+        return @attribute_hash unless @attribute_hash.nil?
+
+        @attribute_hash = { attribute.attribute_name.to_s => attribute, }
         space_n_attributes.elements.each{|space_n_attribute| 
-          hash.update space_n_attribute.attribute.attribute_name.to_s => space_n_attribute.attribute
+          @attribute_hash.update space_n_attribute.attribute.attribute_name.to_s => space_n_attribute.attribute
         }
-        hash
+        @attribute_hash
+      end
+
+      def [] key_or_index
+        if ( key_or_index.is_a? String and key_or_index =~ /^\d+$/ ) or key_or_index.is_a? Fixnum
+          attributes = self.to_a
+        else
+          attributes = self.to_hash
+        end
+
+        attributes[key_or_index]
       end
 
       def has_key? key
