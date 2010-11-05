@@ -1,0 +1,64 @@
+span.signin_button {
+	border: 2px outset tan;
+	background-color: tan;
+	padding: 3px;
+	margin: 3px;
+}
+
+span.signin_button a {
+	color: black;
+	text-decoration: none;
+}
+
+span.signin_button:hover {
+	cursor: pointer;
+}
+
+span.signin_down {
+	border-style: inset;
+}
+
+div.signin_show {
+	display: block;
+}
+
+.signin_hide {
+	display: none;	
+}
+
+input[type=text], input[type=password] {
+	border: 0px;
+	border-bottom: 1px dashed tan;
+	text-align: center;
+}
+
+input[type=submit] {
+	background-color: tan;	
+}
+
+fieldset {
+	width: 25%;
+	border: 2px groove tan;
+	padding: 20px;
+	margin: 10px;
+	line-height: 25px;
+}
+
+.subdued {
+	color: dimgray;
+}
+.pronounced {
+	color: blank;	
+}
+
+body {
+/*				text-align: center;*/
+}
+
+fieldset {
+	text-align: left;
+}
+
+form {
+	padding-top: 20%;
+}

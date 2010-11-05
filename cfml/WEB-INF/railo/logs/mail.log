@@ -1,0 +1,25 @@
+"Severity","ThreadID","Date","Time","Application","Message"
+"ERROR","web-0","10/04/2010","12:09","mail spooler","Could not connect to SMTP host: localhost, port: 25;
+  nested exception is:
+	java.net.ConnectException: Connection refused"
+"ERROR","web-0","10/04/2010","12:09","mail spooler","Could not connect to SMTP host: localhost, port: 25;
+  nested exception is:
+	java.net.ConnectException: Connection refused"
+"ERROR","web-0","10/04/2010","12:10","mail spooler","Could not connect to SMTP host: localhost, port: 25;
+  nested exception is:
+	java.net.ConnectException: Connection refused"
+"ERROR","web-0","10/04/2010","12:11","mail spooler","Could not connect to SMTP host: localhost, port: 25;
+  nested exception is:
+	java.net.ConnectException: Connection refused"
+"ERROR","web-0","10/04/2010","12:12","mail spooler","Could not connect to SMTP host: localhost, port: 25;
+  nested exception is:
+	java.net.ConnectException: Connection refused"
+"ERROR","web-0","10/04/2010","12:13","mail spooler","Could not connect to SMTP host: localhost, port: 25;
+  nested exception is:
+	java.net.ConnectException: Connection refused"
+"ERROR","web-0","10/04/2010","12:14","mail spooler","Could not connect to SMTP host: localhost, port: 25;
+  nested exception is:
+	java.net.ConnectException: Connection refused"
+"ERROR","web-0","10/04/2010","13:14","mail spooler","Could not connect to SMTP host: localhost, port: 25;
+  nested exception is:
+	java.net.ConnectException: Connection refused"
