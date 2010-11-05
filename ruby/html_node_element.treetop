@@ -1,0 +1,35 @@
+require 'html_parser'
+require 'html_attribute'
+
+grammar HTMLNodeElement
+  include HTML
+  include HTMLAttribute
+
+  rule node
+    # open_node ( ( text / element )+ close_node )*
+    # It'd be something like this if I were creating an HTML parser.
+    # But I'm not. (Notice the disconnect in open/close node detection)
+
+    gt name:( !space any )+ ( space attributes )* space? '/'? lt {
+      def node_name
+        elements[1].text_value
+      end
+
+      def attributes
+        elements[2].elements[0].attributes
+      end
+
+      def empty?
+        elements[4].text_value == '/'
+      end
+    }
+  end
+
+  rule gt
+    '<'
+  end
+
+  rule lt
+    '>'
+  end
+end
