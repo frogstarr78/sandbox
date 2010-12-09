@@ -1,0 +1,34 @@
+	serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+	# because we don't want to change testCase here
+	# redir stdout to echo back to the calling client
+
+	serverSocket.bind((socket.gethostname(), 99343))
+	serverSocket.listen(5)
+	print "Listening ..."
+	WTest = None
+
+	while 1:
+		(clientSocket, address) = serverSocket.accept()
+
+		recievedMessage = ""
+		chunk = ""
+		if WTest == None:
+			WTest = win32tests("http://demon.89glass.com/~scott/", "scott.noel-hemming@rbsinteractive.com")
+		
+		while re.search("ET--$", recievedMessage) == None: 
+			chunk = clientSocket.recv(1)
+			if chunk == "\n":
+				for method in dir(WTest):
+					if re.compile(".*" + string.rstrip(recievedMessage) + ".*", re.I).search(method) and str(type(getattr(WTest, method))) == "<type 'instancemethod'>":
+						result = WTest.run(method)
+						#clientSocket.send(result)
+						clientSocket.send(result[1])
+
+				receivedMessage = ""
+			recievedMessage = recievedMessage + chunk
+
+		clientSocket.close()
+		sys.exit(0)
+
+
