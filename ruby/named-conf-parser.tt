@@ -1,0 +1,100 @@
+grammar Named
+  rule zone_records
+    zone_record+ {
+      def each_record &block
+        elements.each &block
+      end
+    } 
+  end
+
+  rule zone_record
+    space* "zone" space+ quoted_domain space+ "in" space+ open_curly space+ record_options close_curly semi space* <Record>
+  end
+
+  rule record_options
+    type_def space+
+    file_def space+
+    master_def space+
+    ( transfer_source_def space+ )?
+  end
+
+  rule type_def
+    "type" space+ "slave" space* semi 
+  end
+
+  rule file_def
+    "file" space+ file_path:quoted_domain space? semi
+  end
+
+  rule master_def
+    "masters" space+ open_curly space* raw_ip space? semi space* close_curly space? semi
+  end
+
+  rule transfer_source_def
+    "transfer-source" space+ raw_ip space? semi
+  end
+
+  rule options_config
+    space* "options" space+ open_curly space+ options_options close_curly semi space*
+  end
+
+  rule options_options
+    directory_path:file_config_def space+
+    dump_file:file_config_def space+
+    statistics_file:file_config_def space+
+    allow_query:host_allow_def space+
+    allow_query_cache:host_allow_def space+
+    allow_recursion:host_allow_def space+
+    notify_def space+
+  end
+
+  rule file_config_def
+    ( "directory" / "dump-file" / "statistics-file" ) space+ file_path:quoted_domain space? semi
+  end
+
+  rule host_allow_def
+    ( "allow-query" / "allow-query-cache" / "allow-recursion" ) space+ open_curly space* raw_ip space? semi space* close_curly space? semi
+  end
+
+  rule host_list_def
+  end
+
+  rule logging_config
+    space* "logging" ( !( close_curly semi ) . )+ close_curly semi
+  end
+
+#  rule logging_options
+#  end
+
+  rule space
+    "\t" / " " / "\n"
+  end
+
+  rule quoted_domain
+    quote name:( !quote . )+ quote
+  end
+
+  rule quote
+    "\""
+  end
+
+  rule open_curly
+    "{"
+  end
+
+  rule semi
+    ";"
+  end
+
+  rule newline
+    "\n"
+  end
+
+  rule raw_ip
+    ( !semi !space . )+
+  end
+
+  rule close_curly
+    "}"
+  end
+end
