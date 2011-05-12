@@ -74,7 +74,7 @@ grammar Named
 #  end
 
   rule space
-    "\t" / " " / "\n"
+    "\t" / " " / "\n" / comments
   end
 
   rule quoted_domain
@@ -126,7 +126,19 @@ grammar Named
     "}"
   end
 
+  rule comments
+    hash_comment / c_comment / multiline_c_comment
+  end
+
+  rule hash_comment
+    '#' .+
+  end
+
   rule c_comment
+    '//' .+
+  end
+
+  rule multiline_c_comment
     '/*'
     ( !'*/' ( . / space )+)*
     '*/'
