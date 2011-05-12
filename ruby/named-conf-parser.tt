@@ -1,14 +1,15 @@
 grammar Named
   rule zone_records
-    zone_record+ {
-      def each_record &block
-        elements.each &block
-      end
-    } 
+    options_config zone_records:zone_record+ <NamedConf>
   end
 
   rule zone_record
-    space* "zone" space+ quoted_domain space+ "in" space+ open_curly space+ record_options close_curly semi space* <Record>
+    space* "zone"
+    space+ quoted_domain
+    space+ "in"
+    space+ open_curly
+    space+ record_options close_curly semi
+    space* <Record>
   end
 
   rule record_options
@@ -45,7 +46,7 @@ grammar Named
     allow_query:host_allow_def space+
     allow_query_cache:host_allow_def space+
     allow_recursion:host_allow_def space+
-    notify_def space+
+    notify_def:boolean_def space+
   end
 
   rule file_config_def
@@ -53,10 +54,16 @@ grammar Named
   end
 
   rule host_allow_def
-    ( "allow-query" / "allow-query-cache" / "allow-recursion" ) space+ open_curly space* raw_ip space? semi space* close_curly space? semi
+    ( "allow-query-cache" / "allow-query" / "allow-recursion" ) space+ open_curly space* host_list_def close_curly space? semi
   end
 
   rule host_list_def
+    'any' space? semi space* / 
+    ( raw_ip space? semi space* )*
+  end
+
+  rule boolean_def
+    ( 'notify' / 'print-time' ) space ( 'yes' / 'no' ) semi
   end
 
   rule logging_config
@@ -91,10 +98,38 @@ grammar Named
   end
 
   rule raw_ip
-    ( !semi !space . )+
+    ( octet dot octet dot octet dot octet cidr? )+
+  end
+
+  rule octet
+    number 1..3 
+  end
+
+  rule cidr
+    '/' ( 
+       ( '3'  [0-2]  ) /
+       ( '1'  number ) /
+       ( '2'  number ) /
+       ( '0'? number ) 
+     )
+  end
+
+  rule number
+    [0-9]
+  end
+
+  rule dot
+    '.'
   end
 
   rule close_curly
     "}"
   end
+
+  rule c_comment
+    '/*'
+    ( !'*/' ( . / space )+)*
+    '*/'
+  end
+
 end
