@@ -1,83 +1,145 @@
 grammar Named
   rule zone_records
-    options_config zone_records:zone_record+ <NamedConf>
+    options_config logging_config zone_records:zone_record+ <NamedConf>
   end
 
   rule zone_record
-    space* "zone"
-    space+ quoted_domain
-    space+ "in"
-    space+ open_curly
-    space+ record_options close_curly semi
-    space* <Record>
+    space*
+    "zone"      space+
+    quoted_name space+
+    "in"        space+
+    open_curly  space+
+    record_options close_curly semi space* <Record>
   end
 
   rule record_options
-    type_def space+
-    file_def space+
-    master_def space+
-    ( transfer_source_def space+ )?
+    type_def
+    file_def
+    master_def?
+    transfer_source_def?
   end
 
   rule type_def
-    "type" space+ "slave" space* semi 
+    "type"  space+
+    type:( "slave" / "master" / "forward" / "hint" / "stub" / "delegation-only" ) space*
+    semi    space+
   end
 
   rule file_def
-    "file" space+ file_path:quoted_domain space? semi
+    "file" space+ 
+    file_path:quoted_name space?
+    semi space+
   end
 
   rule master_def
-    "masters" space+ open_curly space* raw_ip space? semi space* close_curly space? semi
+    "masters" space+
+    open_curly space*
+    raw_ip space?
+    semi space*
+    close_curly space?
+    semi space+
   end
 
   rule transfer_source_def
-    "transfer-source" space+ raw_ip space? semi
+    "transfer-source" space+
+    raw_ip space?
+    semi space+
   end
 
   rule options_config
-    space* "options" space+ open_curly space+ options_options close_curly semi space*
+    space*
+    "options" space+
+    open_curly space+
+    options_options close_curly semi space*
   end
 
   rule options_options
-    directory_path:file_config_def space+
-    dump_file:file_config_def space+
-    statistics_file:file_config_def space+
-    allow_query:host_allow_def space+
-    allow_query_cache:host_allow_def space+
-    allow_recursion:host_allow_def space+
-    notify_def:boolean_def space+
+    directory_path:file_config_def
+    dump_file:file_config_def
+    statistics_file:file_config_def
+    allow_query:host_allow_def
+    allow_query_cache:host_allow_def
+    allow_recursion:host_allow_def
+    query_source_def?
+    notify_def:boolean_def
   end
 
   rule file_config_def
-    ( "directory" / "dump-file" / "statistics-file" ) space+ file_path:quoted_domain space? semi
+    ( "directory" / "dump-file" / "statistics-file" ) space+
+    file_path:quoted_name space?
+    semi space+
   end
 
   rule host_allow_def
-    ( "allow-query-cache" / "allow-query" / "allow-recursion" ) space+ open_curly space* host_list_def close_curly space? semi
+    ( "allow-query-cache" / "allow-query" / "allow-recursion" ) space+
+    open_curly space*
+    host_list_def close_curly space?
+    semi space+
   end
 
   rule host_list_def
-    'any' space? semi space* / 
-    ( raw_ip space? semi space* )*
+    'any' space?
+    semi space* / 
+    ( raw_ip space?
+    semi space* )*
+  end
+
+  rule query_source_def
+    'query-source' space
+    'address' space
+    '*' space
+    'port' space
+    number+ space?
+    semi space+
   end
 
   rule boolean_def
-    ( 'notify' / 'print-time' ) space ( 'yes' / 'no' ) semi
+    ( 'notify' / 'print-time' ) space
+    ( 'yes' / 'no' ) semi space+
   end
 
   rule logging_config
-    space* "logging" ( !( close_curly semi ) . )+ close_curly semi
+    space*
+    "logging" space+
+    open_curly space+
+    logging_options close_curly semi space*
   end
 
-#  rule logging_options
-#  end
+  rule logging_options
+    channel_def
+    category_def+
+  end
+
+  rule channel_def
+    'channel' space
+    'query_logging' space
+    open_curly space+
+    log_file_def
+    print_time:boolean_def close_curly semi space+
+  end
+
+  rule log_file_def
+    "file" space+
+    quoted_name space+
+    'versions' space
+    number space
+    'size' space
+    number+ ( 'M' / 'G' / 'K' )? semi space+
+  end
+
+  rule category_def
+    'category' space
+    ( 'queries' / 'lame-servers' ) space
+    open_curly space+
+    ( 'query_logging' / 'null' ) semi space+
+    close_curly semi space+
+  end
 
   rule space
     "\t" / " " / "\n" / comments
   end
 
-  rule quoted_domain
+  rule quoted_name
     quote name:( !quote . )+ quote
   end
 
@@ -127,20 +189,20 @@ grammar Named
   end
 
   rule comments
-    hash_comment / c_comment / multiline_c_comment
+    sh_comment / cplus_comment / multiline_c_comment
   end
 
-  rule hash_comment
+  rule sh_comment
     '#' .+
   end
 
-  rule c_comment
+  rule cplus_comment
     '//' .+
   end
 
   rule multiline_c_comment
     '/*'
-    ( !'*/' ( . / space )+)*
+    ( !'*/' . )+
     '*/'
   end
 
