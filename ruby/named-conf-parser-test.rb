@@ -56,76 +56,6 @@ end
 require 'treetop'
 require 'named-conf-parser'
 
-str = %Q(
-// Red Hat BIND Configuration Tool
-// 
-// Default initial "Caching Only" name server configuration
-//
-
-options {
-	directory "/var/named";
-	dump-file "/var/named/data/cache_dump.db";
-        statistics-file "/var/named/data/named_stats.txt";
-	allow-query { any; };
-        allow-query-cache { any; };
-
-	allow-recursion {
-		127.0.0.1;
-		208.77.208.0/24;
-		206.126.21.0/24;
-		64.185.107.177/28;
-		67.158.224.0/24;
-		67.158.225.0/24;
-		208.77.208.0/24;
-		208.77.209.0/24;
-		208.77.210.0/24;
-		208.77.211.0/24;
-		205.210.188.0/24;
-		205.210.189.0/24;
-		205.210.190.0/24;
-		205.210.191.0/24;
-	};
-
-
-	/*
-	 * If there is a firewall between you and nameservers you want
-	 * to talk to, you might need to uncomment the query-source
-	 * directive below.  Previous versions of BIND always asked
-	 * questions using port 53, but BIND 8.1 uses an unprivileged
-	 * port by default.
-	 */
-	 // query-source address * port 53;
-	notify no;
-};
-
-logging {
-	channel query_logging {
-		file "/var/named/log/named_querylog"
-			versions 3 size 100M;
-		print-time yes;			// timestamp log entries
-	};
-	category queries {
-		query_logging;
-	};
-	category lame-servers { null; };
-};
-
-
-
-zone "richardbessey.com" in {
-        type slave;
-        file "slaves/richardbessey.com";
-        masters { 72.10.12.146; };
- };
-
-# Reverse DNS files go here
-
-zone "208.77.208.in-addr.arpa" in {
-        type master;
-        file "master/208.77.208.in-addr.arpa";
-};
-)
-
 str = File.read '../tmp/life-named.conf'
 #str = File.read 'named.conf'
 
@@ -138,9 +68,6 @@ if parsed.nil?
 end
 
 
-#puts parsed.methods.inspect #.elements[2].text_value #each {|rec| rec.text_value }
-#puts parsed.zone_records.elements[2].text_value #each {|rec| rec.text_value }
 parsed.each_record do |item|
-#  puts item.text_value, item.methods.sort.inspect, '-----------' if !item.respond_to? :record?
   printf "%15s %s\n"% [item.ip, item.domain.text_value] if item.slave?
 end
