@@ -56,8 +56,12 @@ end
 require 'treetop'
 require 'named-conf-parser'
 
-str = File.read '../tmp/life-named.conf'
-#str = File.read 'named.conf'
+file_path = File.open '../tmp/life-named.conf'
+#file_path = File.open '../tmp/pine-named.conf'
+#file_path = File.open 'named.conf'
+#file_path = $<
+
+str = file_path.read
 
 parser = NamedParser.new
 parsed = parser.parse str.gsub /\s*(#|\/\/).*/, ''
