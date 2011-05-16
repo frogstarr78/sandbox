@@ -1,5 +1,9 @@
 #!/usr/bin/ruby
 
+def hr size
+  puts '-'*size
+end
+
 def tag(img, opts={})
 	puts opts.inspect
 	opts[:path] ||= 
@@ -294,6 +298,8 @@ $stdout.puts? 'abc', nil, 'def'
 puts 'abc', nil, 'def'
 
 
+require 'time'
+require 'date'
 m = 1
 n = DateTime.new(2009, m)
 1
@@ -311,3 +317,103 @@ require 'enumerator'
   puts m.inject(0) {|l,r| l+=r%12}
   puts m.inject(0) {|l,r| l+=r%30}
 end
+
+module M
+  class P
+    def self.run 
+      print self.name
+      print ' just puts'
+      print ' debug' if self.debug?
+      print ' nodebug' unless self.debug?
+      puts
+    end
+
+    def name
+      self.class.name << ' instance'
+    end
+
+    def run
+      print self.name
+      print ' just puts'
+      print ' debug' if self.debug?
+      print ' nodebug' unless self.debug?
+      puts
+    end
+  end
+
+  module Q
+    @@debug = false
+    def debug!
+      puts 'debug!'
+      @@debug = true
+    end
+
+    def nodebug!
+      puts 'nodebug!'
+      @@debug = false
+    end
+
+    def debug?
+      @@debug
+    end
+  end
+
+  def name
+    self.class.name << ' instance'
+  end
+
+  def self.run
+    print self.name
+    print ' just puts'
+    print ' debug' if self.debug?
+    print ' nodebug' unless self.debug?
+    puts
+  end
+
+  def run
+    print self.name
+    print ' just puts'
+    print ' debug' if self.debug?
+    print ' nodebug' unless self.debug?
+    puts
+  end
+
+  include Q
+end
+
+include M
+hr 10
+puts self.methods.select {|m| m.to_s =~ /debug/ }.inspect
+puts P.methods.select {|m| m.to_s =~ /debug/ }.inspect
+puts P.new.methods.select {|m| m.to_s =~ /debug/ }.inspect
+
+P.run
+P.new.run
+run
+self.class.run
+P.debug!
+P.run
+P.new.run
+run
+self.class.run
+P.nodebug!
+P.new.run
+P.run
+run
+self.class.run
+hr 10
+
+P.run
+P.new.run
+run
+self.class.run
+P.new.debug!
+P.run
+P.new.run
+run
+self.class.run
+P.new.nodebug!
+P.new.run
+P.run
+run
+self.class.run
