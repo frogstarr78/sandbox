@@ -1,6 +1,6 @@
 grammar Named
-  rule zone_records
-    options_config logging_config zone_records:zone_record+ <NamedConf>
+  rule config
+    options_config? logging_config? zone_records:zone_record+ <NamedConf>
   end
 
   rule zone_record
@@ -136,7 +136,7 @@ grammar Named
   end
 
   rule space
-    "\t" / " " / "\n" / comments
+    ( "\t" / " " / "\n" / comments ) space*
   end
 
   rule quoted_name
@@ -193,16 +193,16 @@ grammar Named
   end
 
   rule sh_comment
-    '#' .+
+    '#' ( !newline . )*
   end
 
   rule cplus_comment
-    '//' .+
+    '//' ( !newline . )*
   end
 
   rule multiline_c_comment
     '/*'
-    ( !'*/' . )+
+    ( !'*/' . )*
     '*/'
   end
 

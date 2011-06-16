@@ -6,7 +6,7 @@ require 'ipaddr'
 
 module NamedConf
   def each_record &block
-    elements.last.elements.each &block
+    zone_records.elements.each &block
   end
 end
 
@@ -29,7 +29,7 @@ module Record
   end
 
   def domain
-    quoted_name.name
+    quoted_name.name.text_value
   end
 
   def ip
@@ -56,15 +56,12 @@ end
 require 'treetop'
 require 'named-conf-parser'
 
-file_path = File.open '../tmp/life-named.conf'
-#file_path = File.open '../tmp/pine-named.conf'
-#file_path = File.open 'named.conf'
-#file_path = $<
+file_path = $<
 
 str = file_path.read
 
 parser = NamedParser.new
-parsed = parser.parse str.gsub /\s*(#|\/\/).*/, ''
+parsed = parser.parse str
 
 if parsed.nil?
   puts "Unable to parse string"
@@ -73,5 +70,5 @@ end
 
 
 parsed.each_record do |item|
-  printf "%15s %s\n"% [item.ip, item.domain.text_value] if item.slave?
+  printf "%15s %s\n"% [item.ip, item.domain] if item.slave? or item.master?
 end
