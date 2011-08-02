@@ -1,5 +1,5 @@
 -module(quantum_boolean).
--export([qand/2, qnot/1, fanout/1, toffoli/3, toffoli2/3]).
+-export([qand/2, qnot/1, fanout/1, toffoli/3, toffoli2/3, toffoli3/3]).
 
 %AND ::= 1 if INPUT_X == 1 && INPUT_Y == 1
 %AND ::= 0 if INPUT_X == 0 || INPUT_Y == 0
@@ -28,3 +28,8 @@ toffoli2(X, 1, 0) -> [First, Next] = fanout(X),
                      [First, 1, Next];
 toffoli2(1, 1, Z) -> [1, 1, qnot(Z)];
 toffoli2(X, Y, Z) -> [X, Y, Z].
+
+toffoli3(X, Y, 0) -> [X, Y, qand(X, Y)];
+toffoli3(X, 1, 0) -> [X, 1, X];
+toffoli3(1, 1, Z) -> [1, 1, qnot(Z)];
+toffoli3(X, Y, Z) -> [X, Y, Z].
