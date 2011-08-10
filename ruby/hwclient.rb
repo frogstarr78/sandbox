@@ -1,20 +1,16 @@
 require 'rubygems'
 require 'zmq'
 
-context = ZMQ::Context.new(1)
+cmd=ENV['CMD']
 
-#Socket to talk to server
-puts "Connecting to hello world server..."
-requester = context.socket(ZMQ::REQ)
+context = ZMQ::Context.new(1)
+requester = context.socket(ZMQ::REP)
 requester.connect("ipc://localhost:5555")
 
-0.upto(6) do |request_nbr|
-  puts "Sending request #{request_nbr}..."
-  requester.send "Hello"
-
-  reply = requester.recv
-  puts "Received reply #{request_nbr}: [#{reply}]"
-end
+cmd = requester.recv
+#puts cmd
+msg = %x|#{cmd}|
+requester.send msg
 
 requester.close
 context.close
