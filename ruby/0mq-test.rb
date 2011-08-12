@@ -1,60 +1,72 @@
 require 'rubygems'
-require 'zmq'
+#require 'zmq'
+require 'ffi-rzmq'
 
-cmds = %W(ls\ $HOME
-ls\ $HOME/tmp
-ls\ /tmp
-ls\ $HOME/git/vivio/
-ls\ $HOME/git/vivio/tmp)
-
-
-cmds.size.times do |i|
-  Process.detach(
-    fork { 
-#      puts cmds[i]
-      context = ZMQ::Context.new(1)
-      requester = context.socket(ZMQ::REP)
-      requester.connect("ipc://localhost:5555")
-
-      cmd = requester.recv
-#      puts cmd
-      msg = %x|#{cmd}|
-      requester.send msg
-
-      requester.close
-      context.close
-
-#      %x|ruby hwclient.rb| 
-    } 
-  )
-end
+commands = [
+  'date; ls $HOME',
+  'date; ls $HOME/tmp; sleep 3',
+  'date; ls /tmp',
+  'date; sleep 5; ls $HOME/git/vivio/',
+  'date; ls $HOME/git/vivio/tmp'
+]
+#commands = [
+#  'ls $HOME',
+#  'ls $HOME/tmp',
+#  'ls /tmp',
+#  'ls $HOME/git/vivio/',
+#  'ls $HOME/git/vivio/tmp'
+#]
+cmds=commands
 
 
-context = ZMQ::Context.new(2)
-socket = context.socket(ZMQ::REQ)
-socket.bind("ipc://localhost:5555")
+res = []
 
-max_clients = 5
-num_clients = 0
-
-cmds.each do |cmd|
-#cmds.size.times do |i|
-  socket.send(cmd)
-  sleep 1
-  request = socket.recv
-  puts "Recieved request. Data: #{request.inspect}"
-end
-
-#while num_clients != max_clients do
-#  puts "requesting #{cmds[num_clients]}"
-#  socket.send(cmds[num_clients])
-#  sleep 1
-#  request = socket.recv
-#
-#  puts "Recieved request. Data: #{request.inspect}"
-#
-#  num_clients += 1
+#commands.size.times do |i|
+#  puts "starting worker #{i}"
+#  Process.detach(
+#    fork do 
+#      context = ZMQ::Context.new
+#      worker = context.socket(ZMQ::REP)
+#      worker.bind("ipc://localhost:555#{i}")
+#      request = worker.recv
+#      puts "received request #{request}"
+#      msg = %x|#{request}|
+#      puts "sending response #{msg[-10..-1]}"
+#      worker.send(msg)
+##      res << "Recieved request from #{i}'th command \`#{request}\`. Data: #{request.inspect}"
+#      worker.close
+#      context.close
+#    end
+#  )
 #end
 
-socket.close
+context = ZMQ::Context.new
+collector = context.socket(ZMQ::REQ)
+#collector.connect("ipc://*:5555")
+#commands.size.times {|i| collector.connect("tcp://*:955#{i}") }
+
+#poller = ZMQ::Poller.new
+#poller.register(collector, ZMQ::POLLIN)
+
+#mk_req = lambda {
+  cmds.each_with_index do |cmd, i|
+#    collector = context.socket(ZMQ::XREQ)
+    url = "ipc://localhost:555#{i}"
+    url = "tcp://localhost:555#{i}"
+    url = "ipc://localhost:5555"
+    collector.connect(url)
+    puts "client requesting cmd \`#{cmd}\`"
+    collector.send_string cmd
+    resp = collector.recv_string
+    puts "client received resp #{resp}"
+    res << resp
+#    collector.close
+  end
+#}
+
+#mk_req.call
+
+collector.close
 context.close
+
+puts res.collect(&:inspect)
