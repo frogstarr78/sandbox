@@ -34,7 +34,7 @@ module Record
 
   def ip
     if slave?
-      ip = record_options.elements[2].raw_ip.text_value
+      ip = record_options.elements[2].raw_ipv4.text_value
     else
       ip = '208.77.208.2'
     end

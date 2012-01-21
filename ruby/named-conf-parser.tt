@@ -34,7 +34,7 @@ grammar Named
   rule master_def
     "masters" space+
     open_curly space*
-    raw_ip space?
+    raw_ipv4 space?
     semi space*
     close_curly space?
     semi space+
@@ -42,7 +42,7 @@ grammar Named
 
   rule transfer_source_def
     "transfer-source" space+
-    raw_ip space?
+    raw_ipv4 space?
     semi space+
   end
 
@@ -50,16 +50,18 @@ grammar Named
     space*
     "options" space+
     open_curly space+
-    options_options close_curly semi space*
+    options_options
+    close_curly semi space*
   end
 
   rule options_options
     directory_path:file_config_def
     dump_file:file_config_def
     statistics_file:file_config_def
-    allow_query:host_allow_def
-    allow_query_cache:host_allow_def
-    allow_recursion:host_allow_def
+    allow_query:net_allow_def
+    allow_query_cache:net_allow_def
+    transfer_source:host_allow_def
+    allow_recursion:net_allow_def
     query_source_def?
     notify_def:boolean_def
   end
@@ -71,6 +73,20 @@ grammar Named
   end
 
   rule host_allow_def
+    ( "transfer-source" ) space+
+    ( raw_ipv4 / '*' ) strict_port_def? 
+    semi space+
+  end
+
+  rule strict_port_def
+    space+ 'port' space+ number+
+  end
+
+  rule loose_port_def
+    space+ 'port' space+ ( number+ / '*' )
+  end
+
+  rule net_allow_def
     ( "allow-query-cache" / "allow-query" / "allow-recursion" ) space+
     open_curly space*
     host_list_def close_curly space?
@@ -80,7 +96,7 @@ grammar Named
   rule host_list_def
     'any' space?
     semi space* / 
-    ( raw_ip space?
+    ( raw_ipv4 space?
     semi space* )*
   end
 
@@ -159,7 +175,7 @@ grammar Named
     "\n"
   end
 
-  rule raw_ip
+  rule raw_ipv4
     ( octet dot octet dot octet dot octet cidr? )+
   end
 
