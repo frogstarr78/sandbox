@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href='http://fonts.googleapis.com/css?family=PT+Serif' rel='stylesheet' type='text/css'>
+<title>PL101: Create your own programming language</title>
+<link rel="stylesheet" type="text/css" href="css/base.css" />
+<!-- start Mixpanel -->
+<script type="text/javascript">(function(d,c){var a,b,g,e;a=d.createElement("script");a.type="text/javascript";a.async=!0;a.src=("https:"===d.location.protocol?"https:":"http:")+'//api.mixpanel.com/site_media/js/api/mixpanel.2.js';b=d.getElementsByTagName("script")[0];b.parentNode.insertBefore(a,b);c._i=[];c.init=function(a,d,f){var b=c;"undefined"!==typeof f?b=c[f]=[]:f="mixpanel";g="disable track track_pageview track_links track_forms register register_once unregister identify name_tag set_config".split(" ");
+for(e=0;e<g.length;e++)(function(a){b[a]=function(){b.push([a].concat(Array.prototype.slice.call(arguments,0)))}})(g[e]);c._i.push([a,d,f])};window.mixpanel=c})(document,[]);
+mixpanel.init("fe4466a304678cd7b7c7705f4b813fcb");</script>
+<!-- end Mixpanel -->
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="nav" />
+    <img src="gfx/logo.png" />
+    <br></br>
+    <br></br>
+    
+  
+
+    <br></br>
+    
+      <a href="http://nathansuniversity.com/vanilla/"><img src="gfx/forums.png" /></a>
+    
+  </div>
+  
+  <div class="content">
+  <!---
+Copyright 2012, Nathan Whitehead
+
+Part of Programming Languages 101:
+Create Your Own Programming Language
+
+NathansUniversity.com
+-->
+
+<h1>JavaScript Review</h1>
+
+<p>We'll be using JavaScript throughout this class.
+Since JavaScript is our tool, we should
+make sure we're ready to use it.
+The more you can remove the friction between
+your thoughts and your code, the better and faster you can learn
+new concepts and code them up.</p>
+
+<p>Not a JavaScript expert?  Don't panic.  We're not going to be
+straining to find the most obscure dark corners of the language
+so we can write code that nobody understands.  The goal is to get
+things working as quickly as possible with code that is as simple
+as possible.  All the references below are to help you get up to speed
+and make it easier to get your project working.  You don't
+have to do everything or read everything.  There is no quiz :)</p>
+
+<h2>On-line Guides</h2>
+
+<h3><a href="http://eloquentjavascript.net/">Eloquent JavaScript</a></h3>
+
+<p><a href="http://eloquentjavascript.net/"><img src="gfx/ejs.png" /></a></p>
+
+<p>Eloquent JavaScript is a great book available free online.  It includes examples and
+programming problems with solutions.  It covers all the basics of JavaScript
+and then some.  The free on-line version is excellent, and there is a paid
+version that is available in print and as an ebook.  The paid version updates
+and expands the text, and is also highly recommended.</p>
+
+<h3><a href="https://developer.mozilla.org/en/JavaScript/Guide">Mozilla JavaScript Guide</a></h3>
+
+<p><a href="https://developer.mozilla.org/en/JavaScript/Guide"><img src="gfx/mdn-logo-sm.png" /></a></p>
+
+<p>The Mozilla JavaScript Guide is a handy introduction to JavaScript
+concepts.  I wouldn't read it straight through, but it's a
+great refresher on specific concepts.  It has nice code examples.</p>
+
+<h3><a href="http://yuiblog.com/crockford/">Crockford on JavaScript Videos</a></h3>
+
+<p><a href="http://yuiblog.com/crockford/"><img src="gfx/crockford.png"></img></a></p>
+
+<p>Douglas Crockford has a nice series of videos on the history of JavaScript,
+its features, and its use.  Lots of great content in the talks.</p>
+
+<h2>Recommended Books</h2>
+
+<h3><a href="http://shop.oreilly.com/product/9780596517748.do">JavaScript: The Good Parts</a></h3>
+
+<p>My favorite JavaScript book is <em>JavaScript: The Good Parts</em> by Douglas Crockford.
+It's short and sweet, packed full of good content.</p>
+
+<h3><a href="http://shop.oreilly.com/product/9780596805531.do">JavaScript: The Definitive Guide</a></h3></h3>
+
+<p>A good reference is <em>JavaScript: The Definitive Guide</em> by David Flanagan.
+This is not a book to sit down and learn JavaScript, but it is
+thorough in its coverage.</p>
+
+<h2>Interactive Tutorials</h2>
+
+<h3><a href="http://nathansjslessons.appspot.com">Nathan's Lessons (What's a closure?)</a></h3></h3>
+
+<p><a href="http://nathansjslessons.appspot.com"><img src="gfx/nathans.png" /></a></p>
+
+<p>If you haven't already, you should
+take a look at Nathan's Lessons,
+my interactive lessons on closures in JavaScript.  If you can finish all
+the lessons you are doing very well.  I think closures are the most powerful
+and elegant of all of JavaScripts features.</p>
+
+<h3><a href="http://ejohn.org/apps/learn/"><i>Secrets of the JavaScript Ninja</i> tutorials</a></h3></h3>
+
+<p><a href="http://ejohn.org/apps/learn/"><img src="gfx/ninja2.jpg" /></a></p>
+
+<p>This is a fun series of interactive tutorials based on John Resig's
+upcoming book <a href="http://jsninja.com/">Secrets of the JavaScript Ninja</a></i>.
+The tutorials cover lots of neat techniques in JavaScript.</p>
+
+<h2>Programming Environment</h2>
+
+<p>A great way of reducing the distance between your ideas and
+working code is to spend some effort setting up a nice environment
+for programming JavaScript.  Getting an efficient environment
+that is comfortable for you to use is essential for rapid
+development.</p>
+
+<p>Here are some tools I've found helpful.</p>
+
+<h3><a href="http://getfirebug.com/">Firebug<a></h3>
+
+<p><a href="http://getfirebug.com"><img src="gfx/firebug-large.png" /></a></p>
+
+<p>Firebug is a great tool that lets you interactively write and debug JavaScript code.
+All web browsers have JavaScript consoles and debuggers available,
+but my favorite is Firebug.  Whichever browser you like using, find
+out how to get to the JavaScript console and get familiar
+with the tools that are available.</p>
+
+<h3><a href="http://nodejs.org">Node.js</a></h3></h3>
+
+<p><a href="http://nodejs.org"><img src="gfx/nodejs-dark.png" /></a></p>
+
+<p>We'll be using Node to run JavaScript programs from the command line.  What can I
+say, I'm old school.  Of course Node also
+offers all kinds of event-driven I/O capabilities, but we'll
+ignore all that and use it to run tests.</p>
+
+<p>The other great thing about Node is
+that it has an ecosystem of tools and a convenient package manager <a href="http://npmjs.org/">npm</a>
+(the Node Package Manager) so they are easy to install.  We'll be using npm
+to install several different packages for our project.  In particular
+we'll be installing and using <a href="http://pegjs.majda.cz/">PEG.js</a> for creating parsers,
+<a href="http://visionmedia.github.com/mocha/">Mocha</a> for JavaScript unit testing,
+and <a href="http://chaijs.com/">Chai</a> for JavaScript assertions.</p>
+
+<h3><a href="http://www.jshint.com/">JSHint</a></h3></h3>
+
+<p><a href="http://www.jshint.com/"><img src="gfx/jshint.png" /></a></p>
+
+<p>JSHint checks your JavaScript code for simple bugs.  You can paste in
+your code to the online form, it's easy.  For automated use at the command
+line you can install a local copy using npm.  It has lots of options for
+turning different checks on or off based on your personal preference.</p>
+
+<hr>
+
+<h2>Challenge Problem</h2>
+
+<p>In order to give you a sense of what kind of code we'll be working with
+in this class, I've put together a challenge problem on binary search
+trees.  If the following explanation and problem make sense and are easy
+for you, you'll set!  If not, don't despair.  We'll be using JavaScript
+in a way that it's not often used, so don't feel bad if it seems strange.
+This example is actually very similar to some of the later code we'll
+write.</p>
+
+<p>Binary search trees pop up everywhere in computer science.
+A binary search tree is made up of nodes.  Each node has some data and up to two
+child nodes, named "left" and "right".  Here's a graphical illustration
+of a happy little binary search tree holding a few letters of data:</p>
+
+<p><center><img src="gfx/binary.png" /></center></p>
+
+<p>An important property of a binary search tree is that for every
+node, everything in the left subtree is <em>less</em> than the data at the node and everything
+in the right subtree is <em>greater</em> than the data at the node.</p>
+
+<p>A simple way to encode binary search trees in JavaScript is to
+create objects that have <code>data</code>, <code>left</code>, and <code>right</code> fields.
+We'll set <code>left</code> and <code>right</code> to <code>null</code> if there is no
+subtree on that side.</p>
+
+<pre><textarea class='demo' name='33768641031122175'>var single_node = {
+    data: 'b',
+    left: null,
+    right: null
+};</textarea></pre>
+
+<p>Here's a little tree with two nodes.</p>
+
+<pre><textarea class='demo' name='3488018729399321650'>var shrub = {
+    data: 'b',
+    left: {
+        data: 'a',
+        left: null,
+        right: null
+    },
+    right: null
+};</textarea></pre>
+
+<p>Now we can build up functions that work on binary search trees.
+Here's the function <code>contains</code> that goes down the tree
+to see if a given value exists in the tree.</p>
+
+<pre><textarea class='demo' name='1549040607443407654'>var contains = function(tree, value) {
+    var location = tree; // start at top of tree
+    // keep searching until we hit a dead end
+    while(location !== null) {
+        // see if we match
+        if(value === location.data) {
+            return true;
+        } else {
+            // go down left or right side based on comparison
+            if(value < location.data) {
+                location = location.left;
+            } else {
+                location = location.right;
+            }
+        }
+    }
+    return false;
+};</textarea></pre>
+
+<p>Of course there's more than one way to skin a cat.  Here's the same
+function implemented in a recursive way.</p>
+
+<pre><textarea class='demo' name='772484282373289665'>var contains = function(tree, value) {
+    // base cases
+    if(tree === null) {
+        return false;
+    }
+    if(value === tree.data) {
+        return true;
+    }
+    // recursive cases
+    if(value < tree.data) {
+        return contains(tree.left, value);
+    } else {
+        return contains(tree.right, value);
+    }
+};</textarea></pre>
+
+<p>Now you try.</p>
+
+<p><em>Write a function <code>count</code> that counts the number of elements in a
+binary search tree.  If you're ambitious, solve it once with recursion
+and once without recursion.</em></p>
+
+<div class="editarea">
+  
+    <textarea id="code" name="usereditor">var count = function(tree) {
+    // your code here
+};</textarea>
+  
+  
+    <p id="cursor">1:1</p>
+  
+  
+    <div id="nextlesson" class="nextlesson">
+        <a id="nextlesson_a1" href="jsreview1.html"><img src="gfx/next.png" /></a>
+        <a id="nextlesson_a2" href="jsreview1.html">Next</a>
+    </div>
+  
+  
+    <textarea class="tests" id="tests" name="tests">// TESTING
+
+// add an element to a tree
+var add_elem = function(tree, value) {
+    if(tree === null) {
+        return {
+            data: value,
+            left: null,
+            right: null
+        };
+    }
+    if(value <= tree.data) {
+        return {
+            data: tree.data,
+            left: add_elem(tree.left, value),
+            right: tree.right
+        };
+    } else {
+        return {
+            data: tree.data,
+            left: tree.left,
+            right: add_elem(tree.right, value)
+        };
+    }
+};
+
+// create a tree from a list of elements
+var create_tree = function(lst) {
+    var i;
+    var curr = null;
+    for(i = 0; i < lst.length; i++) {
+        curr = add_elem(curr, lst[i]);
+    }
+    return curr;
+};
+
+// Evaluate user code
+jshint(answer);
+eval(answer);
+
+// unit tests
+assert_eq( count(null), 0, 
+    'Empty tree has no elements');
+assert_eq( count(create_tree(['b', 'a'])), 2,
+    'Small tree has 2 elements');
+assert_eq( count(create_tree(['b', 'a', 'd', 'e', 'c'])), 5,
+    'Example tree has 5 elements');
+assert_eq( count(create_tree(['a', 'b', 'c', 'd', 'e'])), 5,
+    'Degenerate tree also has 5 elements');</textarea>
+    <img class="centered" src="gfx/slide_down.png" id="tests_button" />
+  
+</div>
+<input id="submitbutton" type="button" value="Run" class="runbutton" />
+<div id="console" class="console"></div>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+  <br></br>
+  
+  
+  <div>
+    
+    
+      <a href="jsreview1.html" style="float:right;">Next</a>
+    
+  </div>
+
+  </div>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="css/codemirror.css" />
+<link rel="stylesheet" type="text/css" href="css/nojw.css" />
+<script src="js/json2.js"></script>
+<script src="js/amplify.min.js"></script>
+<script src="js/peg-0.6.2.min.js"></script>
+<script src="js/underscore-min.js"></script>
+<script src="js/codemirror.js"></script>
+<script src="js/codemirror_javascript.js"></script>
+<script src="js/jshint.js"></script>
+<script src="js/main3.js"></script>
+
+
+</body>
+</html>
