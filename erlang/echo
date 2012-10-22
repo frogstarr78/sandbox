@@ -1,0 +1,13 @@
+#!/usr/bin/env escript
+
+%-module(receiver). 
+%-export([execute/0]). 
+
+%	{ok, Data} = io:get_line(""),
+main(_) ->
+	Data = io:get_line(""),
+	io:format("~s~n", [erlang:is_atom(Data)]),
+	io:format("~s~n", [Data]).
+%main(_) ->
+%	{ok, Data} = io:read(""),
+%	io:format("~s~n", [Data]).

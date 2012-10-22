@@ -1,0 +1,12 @@
+#!/usr/bin/env escript
+
+main(_) ->
+	%% Directly reads the number of hellos as a decimal
+	{ok, [X]} = io:fread("How many Hellos?> ", "~d"),
+	%% Write X hellos
+	hello(X).
+
+hello(0) -> ok;
+hello(N) ->
+	io:fwrite("Hello World!~n"),
+	hello(N - 1).
