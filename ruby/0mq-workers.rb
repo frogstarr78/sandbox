@@ -1,4 +1,5 @@
 require 'rubygems'
+#require 'ffi-rzmq'
 require 'zmq'
 
 commands = [
@@ -26,16 +27,18 @@ commands.size.times do |i|
     fork do 
 #i = ARGV.first.to_i
       context = ZMQ::Context.new
-      worker = context.socket(ZMQ::XREP)
+      worker = context.socket(ZMQ::REP)
       url="ipc://*:555#{i}"
       url="tcp://*:555#{i}"
-      url="ipc://*:5555"
+#      url="ipc://worker.ipc"
       worker.bind(url)
       request = worker.recv
-      puts "worker received request #{request}"
-      msg = %x|#{request}|
-      puts "worker sending response #{msg[-10..-1]}"
+#      request = worker.recv_string
+#      puts "worker#{i} received request #{request}"
+      msg = %x|#{request.strip}|
+#      puts "worker#{i} sending response #{msg[-10..-1]}"
       worker.send(msg)
+#      worker.send_string(msg)
 #      res << "Recieved request from #{i}'th command \`#{request}\`. Data: #{request.inspect}"
       worker.close
       context.close

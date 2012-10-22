@@ -53,6 +53,13 @@ module Record
   end
 end
 
+module Include
+  def file
+    record_options.file_def.file_path.text_value
+  end
+
+end
+
 require 'treetop'
 require 'named-conf-parser'
 

@@ -1,6 +1,6 @@
 require 'rubygems'
-#require 'zmq'
-require 'ffi-rzmq'
+require 'zmq'
+#require 'ffi-rzmq'
 
 commands = [
   'date; ls $HOME',
@@ -40,33 +40,45 @@ res = []
 #  )
 #end
 
-context = ZMQ::Context.new
-collector = context.socket(ZMQ::REQ)
-#collector.connect("ipc://*:5555")
-#commands.size.times {|i| collector.connect("tcp://*:955#{i}") }
+#resp_ctx = ZMQ::Context.new
+#resp_soc = resp_ctx.socket(ZMQ::PULL)
+#resp_soc.connect("ipc://resp.ipc")
 
-#poller = ZMQ::Poller.new
-#poller.register(collector, ZMQ::POLLIN)
+pids = []
+cmds.each_with_index do |cmd, i|
+    Process.detach( fork do 
+      context = ZMQ::Context.new
+      collector = context.socket(ZMQ::REQ)
+      collector.connect("tcp://localhost:555#{i}")
 
-#mk_req = lambda {
-  cmds.each_with_index do |cmd, i|
-#    collector = context.socket(ZMQ::XREQ)
-    url = "ipc://localhost:555#{i}"
-    url = "tcp://localhost:555#{i}"
-    url = "ipc://localhost:5555"
-    collector.connect(url)
-    puts "client requesting cmd \`#{cmd}\`"
-    collector.send_string cmd
-    resp = collector.recv_string
-    puts "client received resp #{resp}"
-    res << resp
-#    collector.close
-  end
-#}
+      resp_sink = context.socket(ZMQ::PUSH)
+      resp_sink.connect("ipc://resp.ipc")
+      puts "client requesting cmd#{i} \`#{cmd}\`"
+      collector.send cmd
+      resp = collector.recv
+#      puts "client received resp#{i} #{resp}"
+##      res << resp
+      puts "pushing #{resp} from cmd #{cmd} to sink"
+      resp_sink.send resp
+      resp_sink.close
+      collector.close
+      context.close
+    end )
+end
 
-#mk_req.call
+#puts pids.inspect
+#
+#pids.each do |pid|
+#    Process.detach( pid )
+#end
 
-collector.close
-context.close
+#pull_resp = resp_soc.recv
+#puts "pull response #{pull_resp.inspect}"
+#res << pull_resp
+#
+##mk_req.call
+#
+#resp_soc.close
+#resp_ctx.close
 
-puts res.collect(&:inspect)
+#puts res.inspect, res.collect(&:inspect)

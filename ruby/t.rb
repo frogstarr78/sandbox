@@ -1,5 +1,16 @@
 #!/usr/bin/ruby
 
+def go &block
+  me = "str"
+  me.instance_eval &block
+  me
+end
+
+res = go do |me|
+  self.reverse!
+end
+puts res
+
 def hr size
   puts '-'*size
 end

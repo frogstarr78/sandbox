@@ -91,10 +91,13 @@ class OtherWorld < Tk::Toplevel
 end
 
 class HelloWorld < Tk::Toplevel
-  attr_accessor :other
+  attr_accessor :other, :project
 
-  def initialize parent = nil, keys = nil
-    super parent, :title => 'Hello World', :width => 500
+#  def initialize parent = nil, keys = nil
+#    super parent, :title => 'Hello World', :width => 500
+  def initialize project
+#    @project = TkVariable.new( project )
+    super nil, :title => 'Hello World', :width => 500
 
     bar = TkMenu.new(self) 
 
@@ -125,10 +128,18 @@ class HelloWorld < Tk::Toplevel
     bar.add('cascade',  :label => "System", :menu => sys) 
 
     menu bar
+
+    frm = Tk::Tile::Frame.new(self) { padding "5 5 5 5" }
+    Tk::Tile::Label.new(frm) do
+      text project.name
+    end.pack(:side => 'top', :fill => 'y')
+    frm.pack(     :side => 'top',    :fill => 'y')
   end
 end
 
+Proj = Struct.new :name
+
 root = Tk::Root.new
 root.withdraw
-h = HelloWorld.new
+h = HelloWorld.new Proj.new('Pratt')
 Tk.mainloop

@@ -1,15 +1,23 @@
 grammar Named
   rule config
-    options_config? logging_config? zone_records:zone_record+ <NamedConf>
+    options_config? logging_config? zone_records:( zone_record / include_record )+ <NamedConf>
   end
 
   rule zone_record
     space*
     "zone"      space+
     quoted_name space+
-    "in"        space+
+    "in"        space*
     open_curly  space+
-    record_options close_curly semi space* <Record>
+    record_options close_curly
+    semi space* <Record>
+  end
+
+  rule zone_record
+    space*
+    "include"   space+
+    quoted_name space+
+    semi space* <Include>
   end
 
   rule record_options
