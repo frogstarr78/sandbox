@@ -7,7 +7,7 @@ grammar Named
     space*
     "zone"      space+
     quoted_name space+
-    "in"        space+
+    "in"        space*
     open_curly  space+
     record_options close_curly semi space* <Record>
   end
