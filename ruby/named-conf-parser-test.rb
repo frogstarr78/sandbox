@@ -10,7 +10,7 @@ module NamedConf
   end
 end
 
-module Config
+module NcConfig
   def record?; false; end
 end
 
