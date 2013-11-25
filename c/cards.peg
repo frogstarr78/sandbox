@@ -1,0 +1,27 @@
+%{
+#include <stdio.h>     /* printf() */
+%}
+
+start = i:Value s:Suit { printf("%s of %s\n", i, s); }
+      | [jJ] "oker"    { printf("wild\n"); }
+
+Value = < [2-9] > { $$ = yytext; } 
+      | < "10" >  { $$ = yytext; }
+	  | [jJ]      { $$ = "jack"; } 
+	  | [qQ]      { $$ = "queen"; } 
+	  | [kK]      { $$ = "king"; } 
+	  | [aA]      { $$ = "ace"; } 
+
+Suit = "h" { $$ = "<3"; }
+     | "c" { $$ = "-8"; }
+	 | "d" { $$ = "<>"; }
+	 | "s" { $$ = "->"; }
+
+%%
+
+int main()
+{
+	while (yyparse())
+	;
+	return 0;
+}
