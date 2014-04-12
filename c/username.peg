@@ -1,0 +1,2 @@
+start <- "username"    { printf("%s\n", getlogin()); }
+	   / < . >         { putchar(yytext[0]); }

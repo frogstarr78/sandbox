@@ -1,0 +1,15 @@
+%{
+#include <stdio.h>     /* printf() */
+%}
+
+start = function_call eol
+	| function_definition eol
+
+%%
+
+int main()
+{
+	while (yyparse())
+	;
+	return 0;
+}
