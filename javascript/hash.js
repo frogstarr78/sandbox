@@ -5,7 +5,7 @@
  *
  * I keep it around because of the nifty feature that
  * I implemented in it. Hash with regex keys. Only
- * the regex is a regex lookup on the keys stored in the has
+ * the regex is a regex lookup on the keys stored in the hash
  * rather than objects, like in ruby, who's reference would be the
  * key. I thought it was ingenious at the time and still
  * think it is a pretty useful feature despite my turning away
