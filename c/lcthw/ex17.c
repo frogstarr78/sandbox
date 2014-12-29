@@ -100,6 +100,20 @@ void Database_create(struct Connection *conn)
 	}
 }
 
+int Database_nrows( struct Connection *conn )
+{
+	int r = 0;
+	int i;
+	struct Database *db = conn->db;
+	for(i=0; i < MAX_ROWS; i++) {
+		struct Address *cur = &db->rows[i];
+		if(cur->set) {
+			r++;
+		}
+	}
+	return r;
+}
+
 void Database_set(struct Connection *conn, int id, const char *name, const char *email)
 {
 	struct Address *addr = &conn->db->rows[id];
@@ -112,6 +126,13 @@ void Database_set(struct Connection *conn, int id, const char *name, const char 
 
 	res = strncpy(addr->email, email, MAX_DATA);
 	if(!res) die("Email copy failed.");
+}
+
+void Database_add(struct Connection *conn, const char *name, const char *email)
+{
+	int id = Database_nrows(conn)+1;
+	printf("%d\n", id);
+	Database_set(conn, id, name, email);
 }
 
 void Database_update(struct Connection *conn, int id, const char *name, const char *email)
@@ -216,6 +237,16 @@ int main(int argc, char *argv[])
 				Database_close(conn);
 				break;
 
+			case 'a':
+				if(argc > 3)  id = atoi(argv[3]);
+				//if(argc != 5) die("Need name, and email to set.");
+
+				conn = Database_open(filename, action);
+				Database_add(conn, argv[4], argv[5]);
+				Database_write(conn);
+				Database_close(conn);
+				break;
+
 			case 's':
 				if(argc > 3)  id = atoi(argv[3]);
 				if(id >= MAX_ROWS) die("The are already too many records.");
@@ -255,8 +286,14 @@ int main(int argc, char *argv[])
 				Database_close(conn);
 				break;
 
+			case 'z':
+				conn = Database_open(filename, action);
+				printf("%d\n", Database_nrows(conn));
+				Database_close(conn);
+				break;
+
 			default:
-				die("Invalid action, only: c=create, g=get, f=find, s=set, d=delete, l=list, u=update");
+				die("Invalid action, only: c=create, a=add, g=get, f=find, s=set, d=delete, l=list, u=update, z=size");
 				break;
 		}
 
