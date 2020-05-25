@@ -1,0 +1,15 @@
+#:kivy 1.0
+
+BoxLayout:
+    id: layout
+    orientation: 'vertical'
+    MyKeyboardListener:
+    Label:
+        text: 'Say hello'
+    Button:
+        text: 'Hello from test.kv'
+        on_press:
+            print('pressed')
+        on_release:
+            print('released')
+        on_state: self._state
